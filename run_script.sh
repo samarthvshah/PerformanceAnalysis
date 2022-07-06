@@ -3,6 +3,18 @@
 # Script Start Date and Time (for use in file name)
 date=`date +"%m-%d-%y_%T"`
 
+# Function for creating the csv files
+fio_csv_creation() {
+		# Run and output to json+ for chart conversion later on
+		fio --output=fio_json_${date}.output --output-format=json+ --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=10 --size=128M --numjobs=1
+		
+		# Convert to csv and delete the json+ and job files
+		fio_jsonplus_clat2csv fio_json_${date}.output fio_csv_${date}.csv
+		created_csv=true
+		rm fio_json_${date}.output
+		rm readlatency-test-job.0.0
+}
+
 # System Information
 echo "CPU INFO:\n\n" > Results/report_${date}.txt
 
@@ -67,7 +79,8 @@ do
 		echo "\n\n\n\nStressAppTest (Memory Bandwidth and Latency):\n" >> Results/report_${date}.txt
 		
 		# Get number of threads for StressAppTest
-		read -p 'How many threads do you want to use for StressAppTest (default is 1, enter -1 to use all the machines threads): ' stressthreadvar
+		echo ""
+		read -p "How many threads do you want to use for StressAppTest (default is 1, enter -1 to use all the machines threads): " stressthreadvar
 		
 		if [ "$stressthreadvar" = "-1" ]; then
 			stressapptest -s 20 -M 256 -W >> Results/report_${date}.txt
@@ -97,8 +110,8 @@ do
 #		fio_csv_creation
 		
 		# Run and output to report file
-		fio --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=120 --size=128M --numjobs=1 write_bw_log=4k-write.results write_iops_log=4k-write.results write_lat_log=4k-write.results >> Results/report_${date}.txt
-		fio_generate_plots "Read Test"
+		fio --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=120 --size=128M --numjobs=1 >> Results/report_${date}.txt
+#		fio_generate_plots "Read Test" 800 600
 		
 		# Delete job file
 		rm readlatency-test-job.0.0
@@ -106,7 +119,8 @@ do
 	elif [ "$workload" = "multichase" ]; then
 	
 		# Get number of threads for multichase
-		read -p 'How many threads do you want to use for multichase (default is 1, enter -1 to use all the machines threads): ' threadvar
+		echo ""
+		read -p "How many threads do you want to use for multichase (default is 1, enter -1 to use all the machines threads): " threadvar
 		
 		if [ "$threadvar" = "-1" ]; then
 			threads=`nproc`
@@ -151,16 +165,5 @@ fi
 
 IFS=$OIFS
 
-function fio_csv_creation {
-		# Run and output to json+ for chart conversion later on
-		fio --output=fio_json_${date}.output --output-format=json+ --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=10 --size=128M --numjobs=1
-		
-		# Convert to csv and delete the json+ and job files
-		unix2dos fio_json_${date}.output
-		python3 src/fio/fio_jsonplus_clat2csv fio_json_${date}.output fio_csv_${date}.csv
-		fio_jsonplus_clat2csv fio_json_${date}.output fio_csv_${date}.csv
-		created_csv=true
-		rm fio_json_${date}.output
-		rm readlatency-test-job.0.0
-}
+
 
