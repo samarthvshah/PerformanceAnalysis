@@ -110,10 +110,6 @@ foreach (@states) {
 		$fio_wk = $workbook->add_worksheet("FIO");
 		$fio_wk->set_row(0, 30);
 		$fio_wk->set_column('A:R',25, $basic_format);
-	
-		# Create new worksheet for the full fio data collected into the csv file to be later turned into a chart
-		$fio_data_wk = $workbook->add_worksheet("FIO Full Data");
-		$fio_data_wk->set_column('A:AB',20, $basic_format);
 	}
 }
 
@@ -169,6 +165,8 @@ while( my $line = <$info>)
 		$file_ind = 1;
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
+		
+#		create_timing_data();
 	} elsif ($line eq "Numactl:") {
 		$state = "numactl";
 		$state_2 = "hw";
@@ -328,11 +326,11 @@ while( my $line = <$info>)
 			$stress_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $primary_header_format);
 			++$excel_ind;
 		# Important info that is only on one line
-		} elsif ($file_ind == 6 || $file_ind == 7 || $file_ind == 9 || $file_ind == 22) {
+		} elsif ($file_ind == 6 || $file_ind == 8 || $file_ind == 21) {
 			$stress_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $basic_centered_format);
 			++$excel_ind;
 		# Adding type headers to each column
-		} elsif ($file_ind == 10) {
+		} elsif ($file_ind == 9) {
 			++$excel_ind;
 			
 			$stress_wk->write( "A${excel_ind}", "Type", $secondary_header_format);
@@ -341,14 +339,14 @@ while( my $line = <$info>)
 			
 			++$excel_ind;
 		# Main data parsing
-		} elsif ($file_ind >= 14 && $file_ind < 21) {
+		} elsif ($file_ind >= 13 && $file_ind < 20) {
 			
 			my ($stats, $key, $val) = split(/:/, $line);
 			
 			$key =~ s/^\s*(.*?)\s*$/$1/;
 			$stress_wk->write( "A${excel_ind}", $key);
 			
-			if ($file_ind == 14) {
+			if ($file_ind == 13) {
 				$stress_wk->write( "B${excel_ind}", $val);
 			} else {
 				$val =~ s/^\s*(.*?)\s*$/$1/;
@@ -505,39 +503,7 @@ while( my $line = <$info>)
 		if ($file_ind == 1) {
 			$fio_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 4, $line, $primary_header_format);
 			
-			++$excel_ind;
-		
-			open my $FH, "fio_csv_${date}_job0.csv" or die "Cannot open csv file: $!\n";	
-			my ($x, $y) = (0,0);
-			
-			while (<$FH>) {
-				@splits = split /,/, $_;
-				
-				foreach my $c (@splits) {
-					if ($x == 0) {
-						$fio_data_wk->write_string($x, $y++, $c, $basic_centered_format);
-					} elsif ($c ne " " && $c ne " \n" && $c ne "\n") {
-						$fio_data_wk->write_number($x, $y++, $c);
-					} else {
-						$y++;
-					}
-				}
-				$x++;$y=0;
-			}
-			
-			close $FH;
-			
-			my $fio_data_chart = $workbook->add_chart( type => 'scatter', subtype => 'smooth', name => 'Timing Data');
-			
-			$fio_data_chart->add_series(
-				categories => '=FIO Full Data!$A$2:$A$350',,
-				values => '=FIO Full Data!$E$2:$E$350',
-				name => 'Timing Data',
-			);
-			
-			$fio_data_chart->set_x_axis( name => 'Times (ns)');
-			$fio_data_chart->set_y_axis( name => '# of timesc');
-						
+			++$excel_ind;			
 		} elsif ($file_ind == 4) {
 			$fio_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 4, $line, $secondary_header_format);
 			++$excel_ind;
@@ -738,3 +704,42 @@ while( my $line = <$info>)
 close $info;
 $workbook->close;
 
+
+
+sub create_timing_data
+{
+			# Create new worksheet for the full fio data collected into the csv file to be later turned into a chart
+			$fio_data_wk = $workbook->add_worksheet("FIO Full Data");
+			$fio_data_wk->set_column('A:AB',20, $basic_format);
+		
+			open my $FH, "fio_csv_${date}_job0.csv" or die "Cannot open csv file: $!\n";	
+			my ($x, $y) = (0,0);
+			
+			while (<$FH>) {
+				@splits = split /,/, $_;
+				
+				foreach my $c (@splits) {
+					if ($x == 0) {
+						$fio_data_wk->write_string($x, $y++, $c, $basic_centered_format);
+					} elsif ($c ne " " && $c ne " \n" && $c ne "\n") {
+						$fio_data_wk->write_number($x, $y++, $c);
+					} else {
+						$y++;
+					}
+				}
+				$x++;$y=0;
+			}
+			
+			close $FH;
+			
+			my $fio_data_chart = $workbook->add_chart( type => 'scatter', subtype => 'smooth', name => 'Timing Data');
+			
+			$fio_data_chart->add_series(
+				categories => '=FIO Full Data!$A$2:$A$350',,
+				values => '=FIO Full Data!$E$2:$E$350',
+				name => 'Timing Data',
+			);
+			
+			$fio_data_chart->set_x_axis( name => 'Times (ns)');
+			$fio_data_chart->set_y_axis( name => '# of timesc');
+}

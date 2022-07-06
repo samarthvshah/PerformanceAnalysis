@@ -65,7 +65,7 @@ do
 	
 		# StressAppTest
 		echo "\n\n\n\nStressAppTest (Memory Bandwidth and Latency):\n" >> Results/report_${date}.txt
-		stressapptest -s 20 -M 256 -W >> Results/report_${date}.txt
+		stressapptest -s 20 -M 256 -W -m 2 >> Results/report_${date}.txt
 		
 	elif [ "$workload" = "stream" ]; then
 	
@@ -79,15 +79,8 @@ do
 		echo "\n\n\n\nFlexible I/O Tester:\n\n" >> Results/report_${date}.txt
 		echo "Latency Test:\n" >> Results/report_${date}.txt
 		
-		# Run and output to json+ for chart conversion later on
-		fio --output=fio_json_${date}.output --output-format=json+ --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=120 --size=128M --numjobs=1
-		
-		# Convert to csv and delete the json+ and job files
-		python3 src/fio/fio_jsonplus_clat2csv fio_json_${date}.output fio_csv_${date}.csv
-#		fio_jsonplus_clat2csv fio_json_${date}.output fio_csv_${date}.csv
-		created_csv=true
-		rm fio_json_${date}.output
-		rm readlatency-test-job.0.0
+		# Create a csv version of the timing data
+#		fio_csv_creation
 		
 		# Run and output to report file
 		fio --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=120 --size=128M --numjobs=1 >> Results/report_${date}.txt
@@ -99,6 +92,7 @@ do
 	
 		# Get number of threads for multichase
 		threads=`nproc` 
+		threads=2
 	
 		# Multichase
 		echo "\n\n\n\nFull Multichase and Multiload:\n\n" >> Results/report_${date}.txt
@@ -112,8 +106,8 @@ do
 		./src/multichase-master/multiload -n 5 -t "${threads}" -m 512M -l memcpy-libc >> Results/report_${date}.txt
 		echo "\n\nFairness Latency:\n" >> Results/report_${date}.txt
 		./src/multichase-master/fairness >> Results/report_${date}.txt
-		echo "\n\nPingpong Latency:\n" >> Results/report_${date}.txt
-		./src/multichase-master/pingpong -u >> Results/report_${date}.txt
+#		echo "\n\nPingpong Latency:\n" >> Results/report_${date}.txt
+#		./src/multichase-master/pingpong -u >> Results/report_${date}.txt
 
 	else
 		echo "Invalid Parameter $workload"
@@ -131,4 +125,17 @@ if [ "$created_csv" = true ] ; then
 fi
 
 IFS=$OIFS
+
+function fio_csv_creation {
+		# Run and output to json+ for chart conversion later on
+		fio --output=fio_json_${date}.output --output-format=json+ --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=10 --size=128M --numjobs=1
+		
+		# Convert to csv and delete the json+ and job files
+		unix2dos fio_json_${date}.output
+		python3 src/fio/fio_jsonplus_clat2csv fio_json_${date}.output fio_csv_${date}.csv
+		fio_jsonplus_clat2csv fio_json_${date}.output fio_csv_${date}.csv
+		created_csv=true
+		rm fio_json_${date}.output
+		rm readlatency-test-job.0.0
+}
 
