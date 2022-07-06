@@ -65,7 +65,21 @@ do
 	
 		# StressAppTest
 		echo "\n\n\n\nStressAppTest (Memory Bandwidth and Latency):\n" >> Results/report_${date}.txt
-		stressapptest -s 20 -M 256 -W -m 2 >> Results/report_${date}.txt
+		
+		# Get number of threads for StressAppTest
+		read -p 'How many threads do you want to use for StressAppTest (default is 1, enter -1 to use all the machines threads): ' stressthreadvar
+		
+		if [ "$stressthreadvar" = "-1" ]; then
+			stressapptest -s 20 -M 256 -W >> Results/report_${date}.txt
+		
+		elif [ "$stressthreadvar" = "" ]; then
+			stressapptest -s 20 -M 256 -W -m 1 >> Results/report_${date}.txt
+		
+		else
+			stressapptest -s 20 -M 256 -W -m "$stressthreadvar" >> Results/report_${date}.txt
+			
+		fi	
+		
 		
 	elif [ "$workload" = "stream" ]; then
 	
@@ -83,7 +97,8 @@ do
 #		fio_csv_creation
 		
 		# Run and output to report file
-		fio --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=120 --size=128M --numjobs=1 >> Results/report_${date}.txt
+		fio --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=120 --size=128M --numjobs=1 write_bw_log=4k-write.results write_iops_log=4k-write.results write_lat_log=4k-write.results >> Results/report_${date}.txt
+		fio_generate_plots "Read Test"
 		
 		# Delete job file
 		rm readlatency-test-job.0.0
@@ -91,8 +106,18 @@ do
 	elif [ "$workload" = "multichase" ]; then
 	
 		# Get number of threads for multichase
-		threads=`nproc` 
-		threads=2
+		read -p 'How many threads do you want to use for multichase (default is 1, enter -1 to use all the machines threads): ' threadvar
+		
+		if [ "$threadvar" = "-1" ]; then
+			threads=`nproc`
+		
+		elif [ "$threadvar" = "" ]; then
+			threads=1
+		
+		else
+			threads=$threadvar
+	
+		fi
 	
 		# Multichase
 		echo "\n\n\n\nFull Multichase and Multiload:\n\n" >> Results/report_${date}.txt
