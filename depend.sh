@@ -8,7 +8,6 @@ date=`date +"%m-%d-%y_%T"`
 checkfor() {
 	if command -v $1 >/dev/null 2>&1 ; then
 		echo "$1 found"
-#		echo "version: $($1 --version)"
 	else
 		echo "$1 not found, installing now"
 		sudo apt install $1 >> log/dependency_log_file_$date.txt
@@ -72,3 +71,20 @@ checkforfile "multichase multiload" "src/multichase-master/multiload"
 checkforfile "multichase fairness" "src/multichase-master/fairness"
 checkforfile "multichase pingpong" "src/multichase-master/pingpong"
 
+# Excel::Writer::XLSX
+
+excel_out=$(perl -e "use Excel::Writer::XLSX")
+
+if [ ! $excel_out = "" ]; then
+	if [ command -v cpanm >/dev/null 2>&1 ]; then
+		echo "cpanm found, installing Excel Writer"
+	else
+		echo "cpanm not found, installing now"
+		sudo apt install cpanminus >> log/dependency_log_file_$date.txt
+		echo "\n" >> log/dependency_log_file_$date.txt
+	fi
+	
+	sudo cpanm Excel::Writer::XLSX
+else
+	echo "Excel Writer found"
+fi
