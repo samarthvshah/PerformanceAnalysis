@@ -8,7 +8,7 @@ use Excel::Writer::XLSX;
 my ($reportfile, $workloadsstr, $date) = @ARGV;
 my $filename = "Results/report_data_${date}.xlsx";
 my @workloads = split(/,/, $workloadsstr);
-my @states = ("cpuinfo", "meminfo", "osinfo", "numastat", "numactl", "numamaps", "lstopo", @workloads);
+my @states = ("cpuinfo", "meminfo", "osinfo", "biosinfo", "bmcinfo", "numastat", "numactl", "numamaps", "lstopo", @workloads);
 
 # Creating a new xlsx file
 my $workbook = Excel::Writer::XLSX->new( $filename );
@@ -26,6 +26,8 @@ my $numamaps_wk;
 my $lstopo_wk;
 my $multichase_wk;
 my $os_info_wk;
+my $bios_info_wk;
+my $bmc_info_wk;
 
 # Creating a new format type for major workload headers
 my $primary_header_format = $workbook->add_format();
@@ -72,6 +74,14 @@ foreach (@states) {
 		$os_info_wk->set_row(0, 30);	
 		$os_info_wk->set_column('A:B',25, $basic_format);
 	# Create a new worksheet for Numastat, setup formatting	
+	} elsif ($_ eq "biosinfo") {
+		$bios_info_wk = $workbook->add_worksheet("BIOS Info");
+		$bios_info_wk->set_row(0, 30);	
+		$bios_info_wk->set_column('A:B',25, $basic_format);
+	} elsif ($_ eq "bmcinfo") {
+		$bmc_info_wk = $workbook->add_worksheet("BMC Info");
+		$bmc_info_wk->set_row(0, 30);	
+		$bmc_info_wk->set_column('A:B',25, $basic_format);
 	} elsif ($_ eq "numastat") {
 		$numastat_wk = $workbook->add_worksheet("Numastat");
 		$numastat_wk->set_row(0, 30);	
@@ -193,6 +203,17 @@ while( my $line = <$info>)
 		$file_ind = 1;
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
+	} elsif ($line eq "BIOS INFO:") {
+		$state = "bios";
+		$file_ind = 1;
+		$excel_ind = 1;
+		$excel_ind_2 = 1;
+		$state_2 = "not started";
+	} elsif ($line eq "BMC INFO:") {
+		$state = "bmc";
+		$file_ind = 1;
+		$excel_ind = 2;
+		$excel_ind_2 = 2;
 	}
 	
 	# Put the corresponding data into the files based on the workload
@@ -317,6 +338,54 @@ while( my $line = <$info>)
 			}
 		}
 		++$excel_ind;
+	# BIOS information parsing
+	} elsif ($state eq "bios") {	
+		$bios_info_wk->set_row(${excel_ind}-1, 30);
+		
+		if ($line eq "BIOS Information") {
+			$state_2 = "started";
+		}
+		
+		if ($state_2 eq "started") {
+			if ($excel_ind == 1) {
+				$bios_info_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 1, $line, $primary_header_format);
+			} elsif ($file_ind > 1) {
+				my ($key, $val) = split(/:/, $line);
+			
+				if (defined $key) {
+					$key =~ s/^\s*(.*?)\s*$/$1/;
+					$bios_info_wk->write( "A${excel_ind}", $key);
+				}
+				
+				if (defined $val) {
+					$val =~ s/^\s*(.*?)\s*$/$1/;
+					$bios_info_wk->write( "B${excel_ind}", $val);	
+				}
+			}
+			++$excel_ind;
+		}
+	# BMC Information Parsing
+	} elsif ($state eq "bmc") {
+	
+		$bmc_info_wk->set_row(${excel_ind}-1, 30);
+		
+		if ($file_ind == 1) {
+			$bmc_info_wk->merge_range( 0, 0, 0, 1, "BMC Information", $primary_header_format);
+		} else {		
+			my ($key, $val) = split(/:/, $line);
+				
+			if (defined $key) {
+				$key =~ s/^\s*(.*?)\s*$/$1/;
+				$bmc_info_wk->write( "A${excel_ind}", $key);
+			}
+			
+			if (defined $val) {
+				$val =~ s/^\s*(.*?)\s*$/$1/;
+				$bmc_info_wk->write( "B${excel_ind}", $val);	
+			}
+		}	
+		++$excel_ind;
+		
 	# StressAppTest parsing
 	} elsif ($state eq "stress") {
 		$stress_wk->set_row(${excel_ind}-1, 30);

@@ -136,15 +136,15 @@ do
 		# Multichase
 		echo "\n\n\n\nFull Multichase and Multiload:\n\n" >> Results/report_${date}.txt
 		echo "Pointer Chase:\n" >> Results/report_${date}.txt
-		./src/multichase-master/multichase -t "${threads}" >> Results/report_${date}.txt
+		./src/multichase/multichase -t "${threads}" >> Results/report_${date}.txt
 		echo "\n\nMultiload Latency:\n" >> Results/report_${date}.txt
-		./src/multichase-master/multiload >> Results/report_${date}.txt
+		./src/multichase/multiload >> Results/report_${date}.txt
 		echo "\n\nMultiload Loaded Latency:\n" >> Results/report_${date}.txt
-		./src/multichase-master/multiload -s 16 -n 5 -t "${threads}" -m 512M -c chaseload -l stream-sum >> Results/report_${date}.txt
+		./src/multichase/multiload -s 16 -n 5 -t "${threads}" -m 512M -c chaseload -l stream-sum >> Results/report_${date}.txt
 		echo "\n\nMultiload Bandwidth:\n" >> Results/report_${date}.txt
-		./src/multichase-master/multiload -n 5 -t "${threads}" -m 512M -l memcpy-libc >> Results/report_${date}.txt
+		./src/multichase/multiload -n 5 -t "${threads}" -m 512M -l memcpy-libc >> Results/report_${date}.txt
 		echo "\n\nFairness Latency:\n" >> Results/report_${date}.txt
-		./src/multichase-master/fairness >> Results/report_${date}.txt
+		./src/multichase/fairness >> Results/report_${date}.txt
 #		echo "\n\nPingpong Latency:\n" >> Results/report_${date}.txt
 #		./src/multichase-master/pingpong -u >> Results/report_${date}.txt
 
