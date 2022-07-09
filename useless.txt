@@ -1,0 +1,1 @@
+This is a random text file to make sure that github includes this "empty folder, this can be safely ignored"
