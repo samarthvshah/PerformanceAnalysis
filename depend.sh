@@ -110,7 +110,7 @@ checkforfile "multichase multiload" "src/multichase/multiload"
 checkforfile "multichase fairness" "src/multichase/fairness"
 checkforfile "multichase pingpong" "src/multichase/pingpong"
 
-if [ $has_multi = "false" ]; then
+if [ $has_multi == "false" ]; then
 	rm -rf "src/multichase"
 	cd src/
 	git clone https://github.com/google/multichase.git
@@ -126,7 +126,7 @@ fi
 excel_out=`perldoc -l Excel::Writer::XLSX`
 
 
-if [ $excel_out = "" ]; then
+if [ $excel_out == "" ]; then
 	if [ command -v cpanm >/dev/null 2>&1 ]; then
 		echo "cpanm found, installing Excel Writer"
 	else
