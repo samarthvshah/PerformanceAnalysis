@@ -11,7 +11,7 @@ checkfor() {
 		echo "$1 found"
 	else
 		echo "$1 not found, installing now"
-		sudo apt-get install $1 >> log/dependency_log_file_$date.txt
+		sudo apt-get -y install $1 >> log/dependency_log_file_$date.txt
 		echo "\n" >> log/dependency_log_file_$date.txt
 	fi
 }
@@ -35,7 +35,7 @@ if command -v cat >/dev/null 2>&1 ; then
 	echo "cat found"
 else
 	echo "cat not found, installing now"
-	sudo apt-get install coreutils >> log/dependency_log_file_$date.txt
+	sudo apt-get -y install coreutils >> log/dependency_log_file_$date.txt
 	echo "\n" >> log/dependency_log_file_$date.txt
 fi
 
@@ -44,7 +44,7 @@ if command -v lscpu >/dev/null 2>&1 ; then
 	echo "lscpu found"
 else
 	echo "lscpu not found, installing now"
-	sudo apt-get install util-linux >> log/dependency_log_file_$date.txt
+	sudo apt-get -y install util-linux >> log/dependency_log_file_$date.txt
 	echo "\n" >> log/dependency_log_file_$date.txt
 fi
 
@@ -53,7 +53,7 @@ if command -v nproc >/dev/null 2>&1 ; then
 	echo "nproc found"
 else
 	echo "nproc not found, installing now"
-	sudo apt-get install coreutils >> log/dependency_log_file_$date.txt
+	sudo apt-get -y install coreutils >> log/dependency_log_file_$date.txt
 	echo "\n" >> log/dependency_log_file_$date.txt
 fi
 
@@ -73,7 +73,7 @@ if command -v lstopo >/dev/null 2>&1 ; then
 	echo "lstopo found"
 else
 	echo "lstopo not found, installing now"
-	sudo apt-get install hwloc >> log/dependency_log_file_$date.txt
+	sudo apt-get -y install hwloc >> log/dependency_log_file_$date.txt
 	echo "\n" >> log/dependency_log_file_$date.txt
 fi
 
@@ -123,14 +123,15 @@ fi
 
 # Excel::Writer::XLSX
 
-excel_out=$(perl -e "use Excel::Writer::XLSX")
+excel_out=`perldoc -l Excel::Writer::XLSX`
 
-if [ ! $excel_out = "" ]; then
+
+if [ $excel_out = "" ]; then
 	if [ command -v cpanm >/dev/null 2>&1 ]; then
 		echo "cpanm found, installing Excel Writer"
 	else
 		echo "cpanm not found, installing now"
-		sudo apt-get install cpanminus >> log/dependency_log_file_$date.txt
+		sudo apt-get -y install cpanminus >> log/dependency_log_file_$date.txt
 		echo "\n" >> log/dependency_log_file_$date.txt
 	fi
 	
