@@ -2,6 +2,7 @@
 
 # Script Start Date and Time (for use in file name)
 date=`date +"%m-%d-%y_%T"`
+file=Results/performance_report_${date}.txt
 
 # Function for creating the csv files
 fio_csv_creation() {
@@ -16,44 +17,55 @@ fio_csv_creation() {
 }
 
 # System Information
-echo "CPU INFO:\n\n" > Results/report_${date}.txt
+echo "CPU INFO:\n\n" > $file
 
 # CPU INFO
-echo "cat:\n" >> Results/report_${date}.txt
-cat /proc/cpuinfo >> Results/report_${date}.txt
+echo "cat:\n" >> $file
+cat /proc/cpuinfo >> $file
 
 # LSCPU INFO
-echo "\nlscpu:\n" >> Results/report_${date}.txt
-lscpu >> Results/report_${date}.txt
+echo "\nlscpu:\n" >> $file
+lscpu >> $file
 
 # Memory Info
-echo "\n\n\n\nMEMORY INFO:" >> Results/report_${date}.txt
-sudo lshw -C memory >> Results/report_${date}.txt
+echo "\n\n\n\nMEMORY INFO:" >> $file
+sudo lshw -C memory >> $file
 
 # OS Info
-echo "\n\n\n\nOS INFO:" >> Results/report_${date}.txt
-uname -a >> Results/report_${date}.txt
-echo "" >> Results/report_${date}.txt
-cat /etc/lsb-release >> Results/report_${date}.txt
+echo "\n\n\n\nOS INFO:" >> $file
+uname -a >> $file
+echo "" >> $file
+cat /etc/lsb-release >> $file
+
+#BIOS Info
+echo "\n\n\n\nBIOS INFO:" >> $file
+sudo dmidecode --type bios >> $file
+#echo "bios version=`sudo dmidecode -s bios-version`" >> $file
+#echo "bios release date=`sudo dmidecode -s bios-release date`" >> $file
+
+# BMC Info
+echo "\n\n\n\nBMC INFO:" >> $file
+sudo ipmitool bmc info >> $file
+sudo ipmitool lan print | grep "IP Address" >> $file
 
 # Numastat
-echo "\n\n\n\nNumastat:\n" >> Results/report_${date}.txt
-numastat -n >> Results/report_${date}.txt
+echo "\n\n\n\nNumastat:\n" >> $file
+numastat -n >> $file
 
 # Numactl
-echo "\n\n\n\nNumactl:\n\n" >> Results/report_${date}.txt
-echo "Numa Hardware Info:\n" >> Results/report_${date}.txt
-numactl --hardware >> Results/report_${date}.txt
-echo "\n\nNuma Policy Info:\n" >> Results/report_${date}.txt
-numactl --show >> Results/report_${date}.txt
+echo "\n\n\n\nNumactl:\n\n" >> $file
+echo "Numa Hardware Info:\n" >> $file
+numactl --hardware >> $file
+echo "\n\nNuma Policy Info:\n" >> $file
+numactl --show >> $file
 
 # Numa maps
-echo "\n\n\n\nNuma Maps:\n" >> Results/report_${date}.txt
-cat /proc/self/numa_maps >> Results/report_${date}.txt
+echo "\n\n\n\nNuma Maps:\n" >> $file
+cat /proc/self/numa_maps >> $file
 
 # Lstopo-no-graphics (System Topology):
-echo "\n\n\n\nLstopo-no-graphics (System Topology):\n" >> Results/report_${date}.txt
-lstopo-no-graphics >> Results/report_${date}.txt
+echo "\n\n\n\nLstopo-no-graphics (System Topology):\n" >> $file
+lstopo-no-graphics >> $file
 lstopo sys_topo_${date}.png
 
 # Main loop
@@ -76,41 +88,45 @@ do
 	if [ "$workload" = "stress" ]; then
 	
 		# StressAppTest
-		echo "\n\n\n\nStressAppTest (Memory Bandwidth and Latency):\n" >> Results/report_${date}.txt
+		echo "\n\n\n\nStressAppTest (Memory Bandwidth and Latency):\n" >> $file
 		
 		# Get number of threads for StressAppTest
 		echo ""
 		read -p "How many threads do you want to use for StressAppTest (default is 1, enter -1 to use all the machines threads): " stressthreadvar
+		read -p "How much memory do you want to use for StressAppTest (default is 40000 -> 40gb the format is the # of megabytes): " stressmemvar
+		
+		if [ "$stressmemvar" = "" ]; then
+			stressmemvar="40000"
+		fi
 		
 		if [ "$stressthreadvar" = "-1" ]; then
-			stressapptest -s 20 -M 256 -W >> Results/report_${date}.txt
-		
+			stressapptest -s 2000 -M $stressmemvar -W >> $file
+
 		elif [ "$stressthreadvar" = "" ]; then
-			stressapptest -s 20 -M 256 -W -m 1 >> Results/report_${date}.txt
-		
+			stressapptest -s 2000 -M $stressmemvar -W -m 31 >> $file
+
 		else
-			stressapptest -s 20 -M 256 -W -m "$stressthreadvar" >> Results/report_${date}.txt
+			stressapptest -s 2000 -M $stressmemvar -W -m "$stressthreadvar" >> $file
 			
-		fi	
-		
+		fi
 		
 	elif [ "$workload" = "stream" ]; then
 	
 		# STREAM
-		echo "\n\n\n\nSTREAM (Memory Bandwidth):\n" >> Results/report_${date}.txt
-		./src/Stream/stream >> Results/report_${date}.txt
+		echo "\n\n\n\nSTREAM (Memory Bandwidth):\n" >> $file
+		./src/Stream/stream >> $file
 		
 	elif [ "$workload" = "fio" ]; then
 	
 		# Flexible I/O tester (Latency Test)
-		echo "\n\n\n\nFlexible I/O Tester:\n\n" >> Results/report_${date}.txt
-		echo "Latency Test:\n" >> Results/report_${date}.txt
+		echo "\n\n\n\nFlexible I/O Tester:\n\n" >> $file
+		echo "Latency Test:\n" >> $file
 		
 		# Create a csv version of the timing data
 #		fio_csv_creation
 		
 		# Run and output to report file
-		fio --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=120 --size=128M --numjobs=1 >> Results/report_${date}.txt
+		fio --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=120 --size=128M --numjobs=1 >> $file
 #		fio_generate_plots "Read Test" 800 600
 		
 		# Delete job file
@@ -118,35 +134,33 @@ do
 		
 	elif [ "$workload" = "multichase" ]; then
 	
+		echo "\n\n\n\nFull Multichase and Multiload:\n\n" >> $file
+	
 		# Get number of threads for multichase
 		echo ""
 		read -p "How many threads do you want to use for multichase (default is 1, enter -1 to use all the machines threads): " threadvar
 		
 		if [ "$threadvar" = "-1" ]; then
 			threads=`nproc`
-		
 		elif [ "$threadvar" = "" ]; then
 			threads=1
-		
 		else
 			threads=$threadvar
-	
 		fi
 	
-		# Multichase
-		echo "\n\n\n\nFull Multichase and Multiload:\n\n" >> Results/report_${date}.txt
-		echo "Pointer Chase:\n" >> Results/report_${date}.txt
-		./src/multichase/multichase -t "${threads}" >> Results/report_${date}.txt
-		echo "\n\nMultiload Latency:\n" >> Results/report_${date}.txt
-		./src/multichase/multiload >> Results/report_${date}.txt
-		echo "\n\nMultiload Loaded Latency:\n" >> Results/report_${date}.txt
-		./src/multichase/multiload -s 16 -n 5 -t "${threads}" -m 512M -c chaseload -l stream-sum >> Results/report_${date}.txt
-		echo "\n\nMultiload Bandwidth:\n" >> Results/report_${date}.txt
-		./src/multichase/multiload -n 5 -t "${threads}" -m 512M -l memcpy-libc >> Results/report_${date}.txt
-		echo "\n\nFairness Latency:\n" >> Results/report_${date}.txt
-		./src/multichase/fairness >> Results/report_${date}.txt
-#		echo "\n\nPingpong Latency:\n" >> Results/report_${date}.txt
-#		./src/multichase-master/pingpong -u >> Results/report_${date}.txt
+		# Multichase tests
+		echo "Pointer Chase:\n" >> $file
+		./src/multichase/multichase -a -s 256 -m 1g -c simple -n 30 >> $file
+		echo "\n\nMultiload Latency:\n" >> $file
+		./src/multichase/multiload >> $file
+		echo "\n\nMultiload Loaded Latency:\n" >> $file
+		./src/multichase/multiload -s 16 -n 5 -t "${threads}" -m 512M -c chaseload -l stream-sum >> $file
+		echo "\n\nMultiload Bandwidth:\n" >> $file
+		./src/multichase/multiload -a -c chaseload -l memcpy-libc -m 1g -s 256 -n 30 -t "${threads}" >> $file
+		echo "\n\nFairness Latency:\n" >> $file
+		./src/multichase/fairness >> $file
+		#echo "\n\nPingpong Latency:\n" >> $file
+		#./src/multichase-master/pingpong -u >> $file
 
 	else
 		echo "Invalid Parameter $workload"
@@ -154,7 +168,7 @@ do
 done
 
 # Call the perl script to convert the txt report file to an excel file that is easier to read
-perl excel_conv.pl "Results/report_${date}.txt" "$workloads" "$date"
+perl excel_conv.pl "$file" "$workloads" "$date"
 
 # Deleting the temp files needed for the excel files after they are inserted
 rm sys_topo_${date}.png
