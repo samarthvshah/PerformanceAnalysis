@@ -65,16 +65,21 @@ echo "\n\n\n\nStressAppTest (Memory Bandwidth and Latency):\n" >> $file
 
 # Get number of threads for StressAppTest
 echo ""
-read -p "How many threads do you want to use for StressAppTest (default is 1, enter -1 to use all the machines threads): " stressthreadvar
+read -p "How many threads do you want to use for StressAppTest (default is 31, enter -1 to use all the machines threads): " stressthreadvar
+read -p "How much memory do you want to use for StressAppTest (default is 40000 -> 40gb the format is the # of megabytes): " stressmemvar
+
+if [ "$stressmemvar" = "" ]; then
+	stressmemvar="40000"
+
 
 if [ "$stressthreadvar" = "-1" ]; then
-	stressapptest -s 2000 -M 256 -W >> $file
+	stressapptest -s 20 -M $stressmemvar -W >> $file
 
 elif [ "$stressthreadvar" = "" ]; then
-	stressapptest -s 20 -M 256 -W -m 1 >> $file
+	stressapptest -s 20 -M $stressmemvar -W -m 31 >> $file
 
 else
-	stressapptest -s 20 -M 256 -W -m "$stressthreadvar" >> $file
+	stressapptest -s 20 -M $stressmemvar -W -m "$stressthreadvar" >> $file
 	
 fi	
 		
@@ -84,13 +89,13 @@ echo "\n\n\n\nFull Multichase and Multiload:\n\n" >> $file
 
 # Get number of threads for multichase
 echo ""
-read -p "How many threads do you want to use for multichase (default is 1, enter -1 to use all the machines threads): " threadvar
+read -p "How many threads do you want to use for multichase (default is 8, enter -1 to use all the machines threads): " threadvar
 
 if [ "$threadvar" = "-1" ]; then
 	threads=`nproc`
 
 elif [ "$threadvar" = "" ]; then
-	threads=1
+	threads=8
 
 else
 	threads=$threadvar
@@ -98,13 +103,13 @@ else
 fi
 
 echo "Pointer Chase:\n" >> $file
-./src/multichase/multichase -t "${threads}" >> $file
+./src/multichase/multichase -a -s 256 -m 1g -c simple -n 30 >> $file
 echo "\n\nMultiload Latency:\n" >> $file
 ./src/multichase/multiload >> $file
 echo "\n\nMultiload Loaded Latency:\n" >> $file
 ./src/multichase/multiload -s 16 -n 5 -t "${threads}" -m 512M -c chaseload -l stream-sum >> $file
 echo "\n\nMultiload Bandwidth:\n" >> $file
-./src/multichase/multiload -n 5 -t "${threads}" -m 512M -l memcpy-libc >> $file
+./src/multichase/multiload -a -c chaseload -l memcpy-libc -m 1g -s 256 -n 30 -t "${threads}" >> $file
 echo "\n\nFairness Latency:\n" >> $file
 ./src/multichase/fairness >> $file
 #echo "\n\nPingpong Latency:\n" >> $file

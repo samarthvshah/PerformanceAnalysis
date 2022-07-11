@@ -22,7 +22,7 @@ checkforfile() {
 	if [ -f $2 ]; then
 		echo "$1 found"
 	else
-		echo "$1 not found, must be manually installed"
+		echo "$1 not found, must be installed"
 		has_multi="false"
 	fi		
 }
@@ -68,12 +68,21 @@ checkfor "numactl"
 
 # Commonly missing packages
 
-#Lstopo is installed using hwloc instead of its name 
+# Lstopo is installed using hwloc instead of its name 
 if command -v lstopo >/dev/null 2>&1 ; then
 	echo "lstopo found"
 else
 	echo "lstopo not found, installing now"
 	sudo apt-get -y install hwloc >> log/dependency_log_file_$date.txt
+	echo "\n" >> log/dependency_log_file_$date.txt
+fi
+
+# Cpanm is installed using cpanminus instead of its name 
+if command -v cpanm >/dev/null 2>&1 ; then
+	echo "cpanm found"
+else
+	echo "cpanm not found, installing now"
+	sudo apt-get -y install cpanminus >> log/dependency_log_file_$date.txt
 	echo "\n" >> log/dependency_log_file_$date.txt
 fi
 
@@ -110,7 +119,7 @@ checkforfile "multichase multiload" "src/multichase/multiload"
 checkforfile "multichase fairness" "src/multichase/fairness"
 checkforfile "multichase pingpong" "src/multichase/pingpong"
 
-if [ $has_multi == "false" ]; then
+if [ $has_multi = "false" ]; then
 	rm -rf "src/multichase"
 	cd src/
 	git clone https://github.com/google/multichase.git
@@ -122,20 +131,4 @@ fi
 	
 
 # Excel::Writer::XLSX
-
-excel_out=`perldoc -l Excel::Writer::XLSX`
-
-
-if [ $excel_out == "" ]; then
-	if [ command -v cpanm >/dev/null 2>&1 ]; then
-		echo "cpanm found, installing Excel Writer"
-	else
-		echo "cpanm not found, installing now"
-		sudo apt-get -y install cpanminus >> log/dependency_log_file_$date.txt
-		echo "\n" >> log/dependency_log_file_$date.txt
-	fi
-	
-	sudo cpanm Excel::Writer::XLSX
-else
-	echo "Excel Writer found"
-fi
+sudo cpanm Excel::Writer::XLSX
