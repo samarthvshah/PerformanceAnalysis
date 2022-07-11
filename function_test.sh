@@ -70,7 +70,7 @@ read -p "How much memory do you want to use for StressAppTest (default is 40000 
 
 if [ "$stressmemvar" = "" ]; then
 	stressmemvar="40000"
-
+fi
 
 if [ "$stressthreadvar" = "-1" ]; then
 	stressapptest -s 20 -M $stressmemvar -W >> $file

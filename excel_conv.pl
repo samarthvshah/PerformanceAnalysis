@@ -133,6 +133,7 @@ my $excel_ind_2 = 1;
 my $loop_index = 0;
 my $node_dis = "false";
 my @splits; 
+my $stat_ind;
 
 # Opening the report file
 open my $info, $reportfile or die "Could not open $reportfile: $!";
@@ -409,6 +410,9 @@ while( my $line = <$info>)
 			++$excel_ind;
 		# Main data parsing
 		} elsif ($file_ind >= 13 && $file_ind < 20) {
+		
+			$stat_ind = index($line, "Stats");
+			$line = substr($line, $stat_ind);
 			
 			my ($stats, $key, $val) = split(/:/, $line);
 			
