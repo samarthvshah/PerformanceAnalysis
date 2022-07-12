@@ -36,6 +36,7 @@ echo "\n\n\n\nOS INFO:" >> $file
 uname -a >> $file
 echo "" >> $file
 cat /etc/lsb-release >> $file
+echo "kernel=`uname -r`" >> $file
 
 #BIOS Info
 echo "\n\n\n\nBIOS INFO:" >> $file
@@ -92,7 +93,7 @@ do
 		
 		# Get number of threads for StressAppTest
 		echo ""
-		read -p "How many threads do you want to use for StressAppTest (default is 1, enter -1 to use all the machines threads): " stressthreadvar
+		read -p "How many threads do you want to use for StressAppTest (default is 31, enter -1 to use all the machines threads): " stressthreadvar
 		read -p "How much memory do you want to use for StressAppTest (default is 40000 -> 40gb the format is the # of megabytes): " stressmemvar
 		
 		if [ "$stressmemvar" = "" ]; then
@@ -100,13 +101,13 @@ do
 		fi
 		
 		if [ "$stressthreadvar" = "-1" ]; then
-			stressapptest -s 2000 -M $stressmemvar -W >> $file
+			stressapptest -s 2000 -M $stressmemvar -W  -v 4 >> $file
 
 		elif [ "$stressthreadvar" = "" ]; then
-			stressapptest -s 2000 -M $stressmemvar -W -m 31 >> $file
+			stressapptest -s 2000 -M $stressmemvar -W -m 31 -v 4  >> $file
 
 		else
-			stressapptest -s 2000 -M $stressmemvar -W -m "$stressthreadvar" >> $file
+			stressapptest -s 2000 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
 			
 		fi
 		
@@ -138,12 +139,12 @@ do
 	
 		# Get number of threads for multichase
 		echo ""
-		read -p "How many threads do you want to use for multichase (default is 1, enter -1 to use all the machines threads): " threadvar
+		read -p "How many threads do you want to use for multichase (default is 8, enter -1 to use all the machines threads): " threadvar
 		
 		if [ "$threadvar" = "-1" ]; then
 			threads=`nproc`
 		elif [ "$threadvar" = "" ]; then
-			threads=1
+			threads=8
 		else
 			threads=$threadvar
 		fi

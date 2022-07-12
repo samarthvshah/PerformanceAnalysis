@@ -73,13 +73,13 @@ if [ "$stressmemvar" = "" ]; then
 fi
 
 if [ "$stressthreadvar" = "-1" ]; then
-	stressapptest -s 2000 -M $stressmemvar -W >> $file
+	stressapptest -s 2000 -M $stressmemvar -W -v 4 >> $file
 
 elif [ "$stressthreadvar" = "" ]; then
-	stressapptest -s 2000 -M $stressmemvar -W -m 31 >> $file
+	stressapptest -s 2000 -M $stressmemvar -W -m 31 -v 4 >> $file
 
 else
-	stressapptest -s 2000 -M $stressmemvar -W -m "$stressthreadvar" >> $file
+	stressapptest -s 2000 -M $stressmemvar -W -m "$stressthreadvar" -v 4 >> $file
 	
 fi	
 		

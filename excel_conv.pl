@@ -166,6 +166,7 @@ while( my $line = <$info>)
 		$file_ind = 1;
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
+		$stress_wk->set_row(6, 30);
 	} elsif ($line eq "STREAM (Memory Bandwidth):") {
 		$state = "stream";
 		$file_ind = 1;
@@ -390,43 +391,47 @@ while( my $line = <$info>)
 	# StressAppTest parsing
 	} elsif ($state eq "stress") {
 		$stress_wk->set_row(${excel_ind}-1, 30);
+		
 
 		# Main header
 		if ($file_ind == 1) {
 			$stress_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $primary_header_format);
 			++$excel_ind;
 		# Important info that is only on one line
-		} elsif ($file_ind == 6 || $file_ind == 8 || $file_ind == 21) {
+		} elsif ($file_ind >= 3 && $file_ind < 7) {
 			$stress_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $basic_centered_format);
 			++$excel_ind;
-		# Adding type headers to each column
-		} elsif ($file_ind == 9) {
-			++$excel_ind;
-			
-			$stress_wk->write( "A${excel_ind}", "Type", $secondary_header_format);
-			$stress_wk->write( "B${excel_ind}", "Total Amount", $secondary_header_format);
-			$stress_wk->write( "C${excel_ind}", "Bandwidth", $secondary_header_format);
-			
-			++$excel_ind;
 		# Main data parsing
-		} elsif ($file_ind >= 13 && $file_ind < 20) {
+		} elsif ($file_ind >= 7) {
+		
+			if ($file_ind == 7) {
+				$stress_wk->write( "A${excel_ind}", "Type", $secondary_header_format);
+				$stress_wk->write( "B${excel_ind}", "Total Amount", $secondary_header_format);
+				$stress_wk->write( "C${excel_ind}", "Bandwidth", $secondary_header_format);
+				
+				++$excel_ind;
+			}
 		
 			$stat_ind = index($line, "Stats");
 			$line = substr($line, $stat_ind);
 			
 			my ($stats, $key, $val) = split(/:/, $line);
 			
-			$key =~ s/^\s*(.*?)\s*$/$1/;
-			$stress_wk->write( "A${excel_ind}", $key);
-			
+			if (defined $key) {
+				$key =~ s/^\s*(.*?)\s*$/$1/;
+				$stress_wk->write( "A${excel_ind}", $key);
+			}
+	
 			if ($file_ind == 13) {
 				$stress_wk->write( "B${excel_ind}", $val);
 			} else {
-				$val =~ s/^\s*(.*?)\s*$/$1/;
-				my ($total, $bandw) = split(/ at /, $val);
-				
-				$stress_wk->write( "B${excel_ind}", $total);
-				$stress_wk->write( "C${excel_ind}", $bandw);
+				if (defined $val) {
+					$val =~ s/^\s*(.*?)\s*$/$1/;
+					my ($total, $bandw) = split(/ at /, $val);
+					
+					$stress_wk->write( "B${excel_ind}", $total);
+					$stress_wk->write( "C${excel_ind}", $bandw);
+				}
 			}
 			++$excel_ind;
 		}
