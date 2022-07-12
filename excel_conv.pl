@@ -392,48 +392,50 @@ while( my $line = <$info>)
 	} elsif ($state eq "stress") {
 		$stress_wk->set_row(${excel_ind}-1, 30);
 		
-
 		# Main header
 		if ($file_ind == 1) {
 			$stress_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $primary_header_format);
 			++$excel_ind;
 		# Important info that is only on one line
-		} elsif ($file_ind >= 3 && $file_ind < 7) {
+		} elsif ($file_ind >= 3 && $file_ind < 6) {
 			$stress_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $basic_centered_format);
 			++$excel_ind;
 		# Main data parsing
-		} elsif ($file_ind >= 7 && index($line, "Stats") != -1) {
+		} elsif ($file_ind >= 6) {
 		
-			if ($file_ind == 7) {
+			if ($file_ind == 6) {
 				$stress_wk->write( "A${excel_ind}", "Type", $secondary_header_format);
 				$stress_wk->write( "B${excel_ind}", "Total Amount", $secondary_header_format);
 				$stress_wk->write( "C${excel_ind}", "Bandwidth", $secondary_header_format);
 				
 				++$excel_ind;
 			}
+			
+			if (index($line, "Stats") != -1 || index($line, "Status") != -1) {
+				$stat_ind = index($line, "Stats");
+				$line = substr($line, $stat_ind);
+				
+				my ($stats, $key, $val) = split(/:/, $line);
+				
+				if (defined $key) {
+					$key =~ s/^\s*(.*?)\s*$/$1/;
+					$stress_wk->write( "A${excel_ind}", $key);
+				}
 		
-			$stat_ind = index($line, "Stats");
-			$line = substr($line, $stat_ind);
-			
-			my ($stats, $key, $val) = split(/:/, $line);
-			
-			if (defined $key) {
-				$key =~ s/^\s*(.*?)\s*$/$1/;
-				$stress_wk->write( "A${excel_ind}", $key);
-			}
-	
-			if ($file_ind == 13) {
-				$stress_wk->write( "B${excel_ind}", $val);
-			} else {
 				if (defined $val) {
 					$val =~ s/^\s*(.*?)\s*$/$1/;
 					my ($total, $bandw) = split(/ at /, $val);
 					
-					$stress_wk->write( "B${excel_ind}", $total);
-					$stress_wk->write( "C${excel_ind}", $bandw);
+					if (defined $total) {
+						$stress_wk->write( "B${excel_ind}", $total);
+					}
+					
+					if (defined $bandw) {
+						$stress_wk->write( "C${excel_ind}", $bandw);
+					}
 				}
-			}
-			++$excel_ind;
+				++$excel_ind;
+			}		
 		}
 	# Numa maps parsing
 	} elsif ($state eq "numamaps") {
