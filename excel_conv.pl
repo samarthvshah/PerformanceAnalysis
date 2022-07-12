@@ -402,7 +402,7 @@ while( my $line = <$info>)
 			$stress_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $basic_centered_format);
 			++$excel_ind;
 		# Main data parsing
-		} elsif ($file_ind >= 7) {
+		} elsif ($file_ind >= 7 && index($line, "Stats") != -1) {
 		
 			if ($file_ind == 7) {
 				$stress_wk->write( "A${excel_ind}", "Type", $secondary_header_format);
