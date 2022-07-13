@@ -72,8 +72,18 @@ else
 	echo "\n" >> log/dependency_log_file_$date.txt
 fi
 
+# uname is part of the coreutils package
+if command -v uname >/dev/null 2>&1 ; then
+	echo "uname found"
+	echo "uname found\n" >> log/dependency_log_file_$date.txt
+else
+	echo "uname not found, installing now"
+	echo "uname not found, installing now" >> log/dependency_log_file_$date.txt
+	sudo apt-get -y install coreutils >> log/dependency_log_file_$date.txt
+	echo "\n" >> log/dependency_log_file_$date.txt
+fi
+
 checkfor "lshw"
-checkfor "uname"
 checkfor "dmidecode"
 checkfor "wget"
 
