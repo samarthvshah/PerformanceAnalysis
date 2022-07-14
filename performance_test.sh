@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Starting sensor data collection
+sh sensor_data.sh &
+sensor_process=$!
+
 # Script Start Date and Time (for use in file name)
 date=`date +"%m-%d-%y_%T"`
 file=Results/performance_report_${date}.txt
@@ -179,6 +183,10 @@ if [ "$created_csv" = true ] ; then
 fi
 
 IFS=$OIFS
+
+
+# Ending sensor data collection
+sudo kill $sensor_process
 
 
 

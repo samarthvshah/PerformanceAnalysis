@@ -1,5 +1,16 @@
 #!/bin/bash
 
+# date is part of the coreutils package
+if command -v date >/dev/null 2>&1 ; then
+	echo "date found"
+	echo "date found\n" >> log/dependency_log_file_$date.txt
+else
+	echo "date not found, installing now"
+	echo "date not found, installing now" >> log/dependency_log_file_$date.txt
+	sudo apt-get -y install coreutils >> log/dependency_log_file_$date.txt
+	echo "\n" >> log/dependency_log_file_$date.txt
+fi
+
 # Script Start Date and Time (for use in file name)
 date=`date +"%m-%d-%y_%T"`
 has_multi="true"
@@ -83,6 +94,17 @@ else
 	echo "\n" >> log/dependency_log_file_$date.txt
 fi
 
+# sleep is part of the coreutils package
+if command -v sleep >/dev/null 2>&1 ; then
+	echo "sleep found"
+	echo "sleep found\n" >> log/dependency_log_file_$date.txt
+else
+	echo "sleep not found, installing now"
+	echo "sleep not found, installing now" >> log/dependency_log_file_$date.txt
+	sudo apt-get -y install coreutils >> log/dependency_log_file_$date.txt
+	echo "\n" >> log/dependency_log_file_$date.txt
+fi
+
 checkfor "lshw"
 checkfor "dmidecode"
 checkfor "wget"
@@ -112,6 +134,17 @@ else
 	echo "cpanm not found, installing now"
 	echo "cpanm not found, installing now" >> log/dependency_log_file_$date.txt
 	sudo apt-get -y install cpanminus >> log/dependency_log_file_$date.txt
+	echo "\n" >> log/dependency_log_file_$date.txt
+fi
+
+# sensors is installed using lm-sensors instead of its name 
+if command -v sensors >/dev/null 2>&1 ; then
+	echo "sensors found"
+	echo "sensors found\n" >> log/dependency_log_file_$date.txt
+else
+	echo "sensors not found, installing now"
+	echo "sensors not found, installing now" >> log/dependency_log_file_$date.txt
+	sudo apt-get -y install lm-sensors >> log/dependency_log_file_$date.txt
 	echo "\n" >> log/dependency_log_file_$date.txt
 fi
 
