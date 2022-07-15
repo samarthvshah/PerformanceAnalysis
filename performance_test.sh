@@ -1,13 +1,5 @@
 #!/bin/bash
 
-# Starting sensor data collection
-sh sensor_data.sh &
-sensor_process=$!
-
-# Script Start Date and Time (for use in file name)
-date=`date +"%m-%d-%y_%T"`
-file=Results/performance_report_${date}.txt
-
 # Function for creating the csv files
 fio_csv_creation() {
 		# Run and output to json+ for chart conversion later on
@@ -19,6 +11,25 @@ fio_csv_creation() {
 		rm fio_json_${date}.output
 		rm readlatency-test-job.0.0
 }
+
+# Ask if the user wants to collect sensor data
+echo ""
+read -p "Do you want to collect sensor data? (yes or no, default is yes): " sensors
+
+# Setting default value
+if [ "$sensors" = "" ]; then
+	sensors="yes"
+fi
+
+# Starting sensor data collection
+if [ "$sensors" = "yes" ]; then
+	sh sensor_data.sh &
+	sensor_process=$!
+fi
+
+# Script Start Date and Time (for use in file name)
+date=`date +"%m-%d-%y_%T"`
+file=Results/performance_report_${date}.txt
 
 # System Information
 echo "CPU INFO:\n\n" > $file
@@ -45,8 +56,6 @@ echo "kernel=`uname -r`" >> $file
 #BIOS Info
 echo "\n\n\n\nBIOS INFO:" >> $file
 sudo dmidecode --type bios >> $file
-#echo "bios version=`sudo dmidecode -s bios-version`" >> $file
-#echo "bios release date=`sudo dmidecode -s bios-release date`" >> $file
 
 # BMC Info
 echo "\n\n\n\nBMC INFO:" >> $file
@@ -186,7 +195,8 @@ IFS=$OIFS
 
 
 # Ending sensor data collection
-sudo kill $sensor_process
-
+if [ "$sensors" = "yes" ]; then
+	sudo kill $sensor_process
+fi
 
 

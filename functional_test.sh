@@ -1,8 +1,20 @@
 #!/bin/bash
 
+# Ask if the user wants to collect sensor data
+echo ""
+read -p "Do you want to collect sensor data? (yes or no, default is yes): " sensors
+
+# Setting default value
+if [ "$sensors" = "" ]; then
+	sensors="yes"
+fi
+
 # Starting sensor data collection
-sh sensor_data.sh &
-sensor_process=$!
+if [ "$sensors" = "yes" ]; then
+	sh sensor_data.sh &
+	sensor_process=$!
+fi
+
 
 # Script Start Date and Time (for use in file name)
 date=`date +"%m-%d-%y_%T"`
@@ -33,8 +45,6 @@ echo "kernel=`uname -r`" >> $file
 #BIOS Info
 echo "\n\n\n\nBIOS INFO:" >> $file
 sudo dmidecode --type bios >> $file
-#echo "bios version=`sudo dmidecode -s bios-version`" >> $file
-#echo "bios release date=`sudo dmidecode -s bios-release date`" >> $file
 
 # BMC Info
 echo "\n\n\n\nBMC INFO:" >> $file
@@ -128,6 +138,8 @@ perl excel_conv.pl "$file" "stress,multichase" "$date"
 rm sys_topo_${date}.png
 
 
-# Ending the sensor data collection
-sudo kill $sensor_process
+# Ending sensor data collection
+if [ "$sensors" = "yes" ]; then
+	sudo kill $sensor_process
+fi
 
