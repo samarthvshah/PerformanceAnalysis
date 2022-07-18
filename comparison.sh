@@ -102,6 +102,7 @@ cat /proc/self/numa_maps >> $file
 # Lstopo-no-graphics (System Topology):
 echo "\n\n\n\nLstopo-no-graphics (System Topology):\n" >> $file
 lstopo-no-graphics >> $file
+lstopo sys_topo_${date}.png
 
 OIFS=$IFS
 IFS=","
@@ -125,28 +126,28 @@ do
 		fi
 		
 		if [ "$stressthreadvar" = "-1" ]; then
-			numactl --cpunodebind=$control_node stressapptest -s 2000 -M $stressmemvar -W -v 4 >> $file
+			numactl --cpunodebind=$control_node stressapptest -s 2 -M $stressmemvar -W -v 4 >> $file
 
 		elif [ "$stressthreadvar" = "" ]; then
-			numactl --cpunodebind=$control_node stressapptest -s 2000 -M $stressmemvar -W -m 1 -v 4  >> $file
+			numactl --cpunodebind=$control_node stressapptest -s 20 -M $stressmemvar -W -m 1 -v 4  >> $file
 
 		else
-			numactl --cpunodebind=$control_node stressapptest -s 2000 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
+			numactl --cpunodebind=$control_node stressapptest -s 20 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
 			
 		fi
 		
 		
 		# StressAppTest for the interest node
-		echo "\n\n\n\nStressAppTest (Memory Bandwidth and Latency) for the interest node $control_node:\n" >> $file
+		echo "\n\n\n\nStressAppTest (Memory Bandwidth and Latency) for the interest node $interest_node:\n" >> $file
 		
 		if [ "$stressthreadvar" = "-1" ]; then
-			numactl --cpunodebind=$interest_node stressapptest -s 2000 -M $stressmemvar -W -v 4 >> $file
+			numactl --cpunodebind=$interest_node stressapptest -s 20 -M $stressmemvar -W -v 4 >> $file
 
 		elif [ "$stressthreadvar" = "" ]; then
-			numactl --cpunodebind=$interest_node stressapptest -s 2000 -M $stressmemvar -W -m 1 -v 4  >> $file
+			numactl --cpunodebind=$interest_node stressapptest -s 20 -M $stressmemvar -W -m 1 -v 4  >> $file
 
 		else
-			numactl --cpunodebind=$interest_node stressapptest -s 2000 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
+			numactl --cpunodebind=$interest_node stressapptest -s 20c -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
 			
 		fi
 		
@@ -205,7 +206,7 @@ do
 		fi
 		
 		
-		echo "\n\n\n\nFull Multichase and Multiload for the control node:\n\n" >> $file
+		echo "\n\n\n\nFull Multichase and Multiload for the control node $control_node:\n\n" >> $file
 	
 		# Multichase tests
 		echo "Pointer Chase:\n" >> $file
@@ -222,7 +223,7 @@ do
 		#numactl --cpunodebind=$control_node ./src/multichase-master/pingpong -u >> $file
 		
 		
-		echo "\n\n\n\nFull Multichase and Multiload for the interest node:\n\n" >> $file
+		echo "\n\n\n\nFull Multichase and Multiload for the interest node $interest_node:\n\n" >> $file
 	
 		# Multichase tests
 		echo "Pointer Chase:\n" >> $file
@@ -244,6 +245,12 @@ do
 done
 
 IFS=$OIFS
+
+# Call the perl script to convert the txt report file to an excel file that is easier to read
+perl comp_excel_conv.pl "$file" "$workloads" "$date" "$control_node" "$interest_node"
+
+# Deleting the temp files needed for the excel files after they are inserted
+rm sys_topo_${date}.png
 
 # Ending sensor data collection
 if [ "$sensors" = "yes" ]; then
