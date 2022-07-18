@@ -42,7 +42,7 @@ echo "\n"
 read -p "What workloads do you want to run? (enter a comma-seperated list, multichase for multichase and multiload, stress for StressAppTest, fio for FIO, and stream for STREAM, all for all workloads, default is no workloads): " workloads
 
 # Setting default value
-if [ "workloads" = "all" ]; then
+if [ "$workloads" = "all" ]; then
 	workloads="multichase,stress,stream,fio"
 fi
 
