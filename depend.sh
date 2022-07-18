@@ -3,12 +3,9 @@
 # date is part of the coreutils package
 if command -v date >/dev/null 2>&1 ; then
 	echo "date found"
-	echo "date found\n" >> log/dependency_log_file_$date.txt
 else
 	echo "date not found, installing now"
-	echo "date not found, installing now" >> log/dependency_log_file_$date.txt
-	sudo apt-get -y install coreutils >> log/dependency_log_file_$date.txt
-	echo "\n" >> log/dependency_log_file_$date.txt
+	sudo apt-get -y install coreutils
 fi
 
 # Script Start Date and Time (for use in file name)
@@ -197,3 +194,17 @@ fi
 # Excel::Writer::XLSX
 echo "Checking for Excel::Writer::XLSX" >> log/dependency_log_file_$date.txt
 sudo cpanm Excel::Writer::XLSX
+
+
+# Lmbench
+
+echo "Removing old lmbench and installing the newest version"
+
+if [ -d "/src/lmbench-3.0-a9/" ]; then
+	rm -rf "src/lmbench-3.0-a9/"
+fi
+
+wget -q -P src/ https://sourceforge.net/projects/lmbench/files/latest/download >> log/dependency_log_file_$date.txt
+tar -xf src/download -C src/ >> log/dependency_log_file_$date.txt
+rm src/download >> log/dependency_log_file_$date.txt
+

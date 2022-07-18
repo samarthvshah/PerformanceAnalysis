@@ -53,6 +53,56 @@ if [ "$sensors" = "yes" ]; then
 	sensor_process=$!
 fi
 
+# System Information
+echo "CPU INFO:\n\n" > $file
+
+# CPU INFO
+echo "cat:\n" >> $file
+cat /proc/cpuinfo >> $file
+
+# LSCPU INFO
+echo "\nlscpu:\n" >> $file
+lscpu >> $file
+
+# Memory Info
+echo "\n\n\n\nMEMORY INFO:" >> $file
+sudo lshw -C memory >> $file
+
+# OS Info
+echo "\n\n\n\nOS INFO:" >> $file
+uname -a >> $file
+echo "" >> $file
+cat /etc/lsb-release >> $file
+echo "kernel=`uname -r`" >> $file
+
+#BIOS Info
+echo "\n\n\n\nBIOS INFO:" >> $file
+sudo dmidecode --type bios >> $file
+
+# BMC Info
+echo "\n\n\n\nBMC INFO:" >> $file
+sudo ipmitool bmc info >> $file
+sudo ipmitool lan print | grep "IP Address" >> $file
+
+# Numastat
+echo "\n\n\n\nNumastat:\n" >> $file
+numastat -n >> $file
+
+# Numactl
+echo "\n\n\n\nNumactl:\n\n" >> $file
+echo "Numa Hardware Info:\n" >> $file
+numactl --hardware >> $file
+echo "\n\nNuma Policy Info:\n" >> $file
+numactl --show >> $file
+
+# Numa maps
+echo "\n\n\n\nNuma Maps:\n" >> $file
+cat /proc/self/numa_maps >> $file
+
+# Lstopo-no-graphics (System Topology):
+echo "\n\n\n\nLstopo-no-graphics (System Topology):\n" >> $file
+lstopo-no-graphics >> $file
+
 OIFS=$IFS
 IFS=","
 

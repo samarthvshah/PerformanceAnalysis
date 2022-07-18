@@ -91,7 +91,7 @@ created_csv=false
 
 # Initialize what workloads to run
 if [ "$1" = "all" ]; then
-	workloads="multichase,stress,stream,fio"
+	workloads="multichase,stress,stream,fio,lmbench"
 else
 	workloads=$1
 fi
@@ -176,6 +176,16 @@ do
 		#echo "\n\nPingpong Latency:\n" >> $file
 		#./src/multichase-master/pingpong -u >> $file
 
+	elif [ "$workload" = "lmbench" ]; then
+		
+		cd src/lmbench-3.0-a9/
+		
+		make results
+		
+		cd ..
+		cd ..
+	
+	
 	else
 		echo "Invalid Parameter $workload"
 	fi
