@@ -208,3 +208,27 @@ wget -q -P src/ https://sourceforge.net/projects/lmbench/files/latest/download >
 tar -xf src/download -C src/ >> log/dependency_log_file_$date.txt
 rm src/download >> log/dependency_log_file_$date.txt
 
+# MLC
+
+if [ -f "src/mlc_v3.9a/Linux/mlc" ]; then
+	echo "mlc found"
+	echo "mlc found\n" >> log/dependency_log_file_$date.txt
+else
+	echo "mlc not found, must be manually installed"
+	echo "mlc not found, must be manually installed\n" >> log/dependency_log_file_$date.txt
+	
+	# Removing folder if already there
+	if [ -d "src/mlc_v3.9a/" ]; then
+		rm -rf "src/mlc_v3.9a/"
+	fi
+	
+	mkdir src/mlc_v3.9a >> log/dependency_log_file_$date.txt
+	
+	wget -q -P src/ downloadmirror.intel.com/736634/mlc_v3.9a.tgz
+	tar -xf src/mlc_v3.9a.tgz -C src/mlc_v3.9a/
+	
+	rm src/mlc_v3.9a.tgz 
+fi	
+
+
+
