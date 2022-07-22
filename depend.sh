@@ -230,5 +230,7 @@ else
 	rm src/mlc_v3.9a.tgz 
 fi	
 
+chmod +x "src/mlc_v3.9a/Linux/mlc"
+
 
 
