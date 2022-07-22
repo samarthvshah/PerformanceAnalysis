@@ -31,6 +31,8 @@ my $multichase_interest_wk;
 my $os_info_wk;
 my $bios_info_wk;
 my $bmc_info_wk;
+my $mlc_control_wk;
+my $mlc_interest_wk;
 
 # Creating a new format type for major workload headers
 my $primary_header_format = $workbook->add_format();
@@ -139,6 +141,14 @@ foreach (@states) {
 		$fio_interest_wk = $workbook->add_worksheet("FIO Interest Node");
 		$fio_interest_wk->set_row(0, 30);
 		$fio_interest_wk->set_column('A:R',25, $basic_format);
+	} elsif ($_ eq "mlc") {
+		$mlc_control_wk = $workbook->add_worksheet("MLC Control Node");
+		$mlc_control_wk->set_row(0, 30);
+		$mlc_control_wk->set_column('A:C',25, $basic_format);
+		
+		$mlc_interest_wk = $workbook->add_worksheet("MLC Interest Node");
+		$mlc_interest_wk->set_row(0, 30);
+		$mlc_interest_wk->set_column('A:C',25, $basic_format);
 	}
 }
 
@@ -254,6 +264,18 @@ while( my $line = <$info>)
 		$file_ind = 1;
 		$excel_ind = 2;
 		$excel_ind_2 = 2;
+	} elsif ($line eq "Intel Memory Latency Checker (MLC) for the control node $control_node:") {
+		$state = "mlc_cont";
+		$file_ind = 1;
+		$excel_ind = 1;
+		$excel_ind_2 = 1;
+		$state_2 = "start";
+	} elsif ($line eq "Intel Memory Latency Checker (MLC) for the interest node $interest_node:") {
+		$state = "mlc_int";
+		$file_ind = 1;
+		$excel_ind = 1;
+		$excel_ind_2 = 1;
+		$state_2 = "start";
 	}
 	
 	# Put the corresponding data into the files based on the workload
@@ -1086,6 +1108,352 @@ while( my $line = <$info>)
 				++$excel_ind;
 			}
 		}
+	} elsif ($state eq "mlc_cont") {
+		$mlc_control_wk->set_row( ${excel_ind}-1, 20);
+		
+		if ($file_ind == 1) {
+			$mlc_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $primary_header_format);
+			++$excel_ind;
+		}
+		
+		
+		if ($line eq "Measuring Peak Injection Memory Bandwidths for the system") {
+			$state_2 = "peakbw";
+			$excel_ind_2 = 0;
+		} elsif ($line eq "Measuring Memory Bandwidths between nodes within system") {
+			$state_2 = "bandbtw";
+			$excel_ind_2 = 0;
+		} elsif ($line eq "Measuring Loaded Latencies for the system") {
+			$state_2 = "loadlat";
+			$excel_ind_2 = 0;
+		} elsif ($line eq "Measuring cache-to-cache transfer latency (in ns)...") {
+			$state_2 = "translat";
+			$excel_ind_2 = 0;
+		} elsif ($line eq "Measuring idle latencies (in ns)...") {
+			$state_2 = "idle";
+			$excel_ind_2 = 0;
+		}
+		
+		if ($state_2 eq "idle") {
+			if ($excel_ind_2 == 0) {
+				$mlc_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $secondary_header_format);
+				++$excel_ind;
+				++$excel_ind_2;
+			} elsif ($excel_ind_2 == 1) {
+				@splits = split(/\s\s+/, $line);
+				
+				$loop_index = 1;
+				
+				foreach(@splits) {
+					$_ =~ s/^\s+//;
+					
+					if ($_ ne "") {
+						$mlc_control_wk->write(${excel_ind}-1, ${loop_index}, $_);
+						++$loop_index;
+					}
+				}
+				++$excel_ind;
+				++$excel_ind_2;
+			} else {
+				@splits = split(/\s\s+/, $line);
+				
+				$loop_index = 0;
+				
+				foreach(@splits) {
+					$_ =~ s/^\s+//;
+					
+					if ($_ ne "") {
+						$mlc_control_wk->write(${excel_ind}-1, ${loop_index}, $_);
+						++$loop_index;
+					}
+				}
+				++$excel_ind;
+				++$excel_ind_2;
+			}
+		} elsif ($state_2 eq "peakbw") {
+			if ($excel_ind_2 == 0) {
+				$mlc_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $secondary_header_format);
+				++$excel_ind;
+				++$excel_ind_2;
+			} elsif ($excel_ind_2 < 4) {
+				$mlc_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $basic_centered_format);
+				++$excel_ind;
+				++$excel_ind_2;
+			} else {
+				my ($key, $val) = split(/:/, $line);
+				
+				if (defined $key) {
+					$key =~ s/^\s*(.*?)\s*$/$1/;
+					$mlc_control_wk->write( "A${excel_ind}", $key);
+				}
+				
+				if (defined $val) {
+					$val =~ s/^\s*(.*?)\s*$/$1/;
+					$mlc_control_wk->write( "B${excel_ind}", $val);
+				}
+				++$excel_ind;
+				++$excel_ind_2;
+			}
+		} elsif ($state_2 eq "bandbtw") {
+			if ($excel_ind_2 == 0) {
+				$mlc_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $secondary_header_format);
+				++$excel_ind;
+				++$excel_ind_2;
+			} elsif ($excel_ind_2 < 4) {
+				$mlc_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $basic_centered_format);
+				++$excel_ind;
+				++$excel_ind_2;	
+			} elsif ($excel_ind_2 == 4) {
+				@splits = split(/\s\s+/, $line);
+				
+				$loop_index = 1;
+				
+				foreach(@splits) {
+					$_ =~ s/^\s+//;
+					
+					if ($_ ne "") {
+						$mlc_control_wk->write(${excel_ind}-1, ${loop_index}, $_);
+						++$loop_index;
+					}
+				}
+				++$excel_ind;
+				++$excel_ind_2;
+			} else {
+				@splits = split(/\s\s+/, $line);
+				
+				$loop_index = 0;
+				
+				foreach(@splits) {
+					$_ =~ s/^\s+//;
+					
+					if ($_ ne "") {
+						$mlc_control_wk->write(${excel_ind}-1, ${loop_index}, $_);
+						++$loop_index;
+					}
+				}
+				++$excel_ind;
+				++$excel_ind_2;
+			}
+		} elsif ($state_2 eq "loadlat") {
+			if ($excel_ind_2 == 0) {
+				$mlc_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $secondary_header_format);
+				++$excel_ind;
+				++$excel_ind_2;
+			} elsif ($excel_ind_2 < 3) {
+				$mlc_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $basic_centered_format);
+				++$excel_ind;
+				++$excel_ind_2;	
+			} elsif (index($line, "=") == -1) {
+				@splits = split(/\s+/, $line);
+				
+				$loop_index = 0;
+				
+				foreach(@splits) {
+					$_ =~ s/^\s+//;
+					
+					if ($_ ne "") {
+						$mlc_control_wk->write(${excel_ind}-1, ${loop_index}, $_);
+						++$loop_index;
+					}
+				}
+				++$excel_ind;
+				++$excel_ind_2;
+			}
+		} elsif ($state_2 eq "translat") {
+			if ($excel_ind_2 == 0) {
+				$mlc_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $secondary_header_format);
+				++$excel_ind;
+				++$excel_ind_2;
+			} else {
+				my ($key, $val) = split(/\t+/, $line);
+				
+				if (defined $key) {
+					$key =~ s/^\s*(.*?)\s*$/$1/;
+					$mlc_wk->write( "A${excel_ind}", $key);
+				}
+				
+				if (defined $val) {
+					$val =~ s/^\s*(.*?)\s*$/$1/;
+					$mlc_wk->write( "B${excel_ind}", $val);
+				}
+				++$excel_ind;
+				++$excel_ind_2;
+			}
+		}
+	
+	} elsif ($state eq "mlc_int") {
+		$mlc_interest_wk->set_row( ${excel_ind}-1, 20);
+		
+		if ($file_ind == 1) {
+			$mlc_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $primary_header_format);
+			++$excel_ind;
+		}
+		
+		
+		if ($line eq "Measuring Peak Injection Memory Bandwidths for the system") {
+			$state_2 = "peakbw";
+			$excel_ind_2 = 0;
+		} elsif ($line eq "Measuring Memory Bandwidths between nodes within system") {
+			$state_2 = "bandbtw";
+			$excel_ind_2 = 0;
+		} elsif ($line eq "Measuring Loaded Latencies for the system") {
+			$state_2 = "loadlat";
+			$excel_ind_2 = 0;
+		} elsif ($line eq "Measuring cache-to-cache transfer latency (in ns)...") {
+			$state_2 = "translat";
+			$excel_ind_2 = 0;
+		} elsif ($line eq "Measuring idle latencies (in ns)...") {
+			$state_2 = "idle";
+			$excel_ind_2 = 0;
+		}
+		
+		if ($state_2 eq "idle") {
+			if ($excel_ind_2 == 0) {
+				$mlc_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $secondary_header_format);
+				++$excel_ind;
+				++$excel_ind_2;
+			} elsif ($excel_ind_2 == 1) {
+				@splits = split(/\s\s+/, $line);
+				
+				$loop_index = 1;
+				
+				foreach(@splits) {
+					$_ =~ s/^\s+//;
+					
+					if ($_ ne "") {
+						$mlc_interest_wk->write(${excel_ind}-1, ${loop_index}, $_);
+						++$loop_index;
+					}
+				}
+				++$excel_ind;
+				++$excel_ind_2;
+			} else {
+				@splits = split(/\s\s+/, $line);
+				
+				$loop_index = 0;
+				
+				foreach(@splits) {
+					$_ =~ s/^\s+//;
+					
+					if ($_ ne "") {
+						$mlc_interest_wk->write(${excel_ind}-1, ${loop_index}, $_);
+						++$loop_index;
+					}
+				}
+				++$excel_ind;
+				++$excel_ind_2;
+			}
+		} elsif ($state_2 eq "peakbw") {
+			if ($excel_ind_2 == 0) {
+				$mlc_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $secondary_header_format);
+				++$excel_ind;
+				++$excel_ind_2;
+			} elsif ($excel_ind_2 < 4) {
+				$mlc_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $basic_centered_format);
+				++$excel_ind;
+				++$excel_ind_2;
+			} else {
+				my ($key, $val) = split(/:/, $line);
+				
+				if (defined $key) {
+					$key =~ s/^\s*(.*?)\s*$/$1/;
+					$mlc_interest_wk->write( "A${excel_ind}", $key);
+				}
+				
+				if (defined $val) {
+					$val =~ s/^\s*(.*?)\s*$/$1/;
+					$mlc_interest_wk->write( "B${excel_ind}", $val);
+				}
+				++$excel_ind;
+				++$excel_ind_2;
+			}
+		} elsif ($state_2 eq "bandbtw") {
+			if ($excel_ind_2 == 0) {
+				$mlc_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $secondary_header_format);
+				++$excel_ind;
+				++$excel_ind_2;
+			} elsif ($excel_ind_2 < 4) {
+				$mlc_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $basic_centered_format);
+				++$excel_ind;
+				++$excel_ind_2;	
+			} elsif ($excel_ind_2 == 4) {
+				@splits = split(/\s\s+/, $line);
+				
+				$loop_index = 1;
+				
+				foreach(@splits) {
+					$_ =~ s/^\s+//;
+					
+					if ($_ ne "") {
+						$mlc_interest_wk->write(${excel_ind}-1, ${loop_index}, $_);
+						++$loop_index;
+					}
+				}
+				++$excel_ind;
+				++$excel_ind_2;
+			} else {
+				@splits = split(/\s\s+/, $line);
+				
+				$loop_index = 0;
+				
+				foreach(@splits) {
+					$_ =~ s/^\s+//;
+					
+					if ($_ ne "") {
+						$mlc_interest_wk->write(${excel_ind}-1, ${loop_index}, $_);
+						++$loop_index;
+					}
+				}
+				++$excel_ind;
+				++$excel_ind_2;
+			}
+		} elsif ($state_2 eq "loadlat") {
+			if ($excel_ind_2 == 0) {
+				$mlc_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $secondary_header_format);
+				++$excel_ind;
+				++$excel_ind_2;
+			} elsif ($excel_ind_2 < 3) {
+				$mlc_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $basic_centered_format);
+				++$excel_ind;
+				++$excel_ind_2;	
+			} elsif (index($line, "=") == -1) {
+				@splits = split(/\s+/, $line);
+				
+				$loop_index = 0;
+				
+				foreach(@splits) {
+					$_ =~ s/^\s+//;
+					
+					if ($_ ne "") {
+						$mlc_interest_wk->write(${excel_ind}-1, ${loop_index}, $_);
+						++$loop_index;
+					}
+				}
+				++$excel_ind;
+				++$excel_ind_2;
+			}
+		} elsif ($state_2 eq "translat") {
+			if ($excel_ind_2 == 0) {
+				$mlc_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $secondary_header_format);
+				++$excel_ind;
+				++$excel_ind_2;
+			} else {
+				my ($key, $val) = split(/\t+/, $line);
+				
+				if (defined $key) {
+					$key =~ s/^\s*(.*?)\s*$/$1/;
+					$mlc_interest_wk->write( "A${excel_ind}", $key);
+				}
+				
+				if (defined $val) {
+					$val =~ s/^\s*(.*?)\s*$/$1/;
+					$mlc_interest_wk->write( "B${excel_ind}", $val);
+				}
+				++$excel_ind;
+				++$excel_ind_2;
+			}
+		}
+	
 	}
 	# Continue looping thorugh the file
 	++$file_ind;
