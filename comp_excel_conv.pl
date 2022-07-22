@@ -1269,12 +1269,12 @@ while( my $line = <$info>)
 				
 				if (defined $key) {
 					$key =~ s/^\s*(.*?)\s*$/$1/;
-					$mlc_wk->write( "A${excel_ind}", $key);
+					$mlc_control_wk->write( "A${excel_ind}", $key);
 				}
 				
 				if (defined $val) {
 					$val =~ s/^\s*(.*?)\s*$/$1/;
-					$mlc_wk->write( "B${excel_ind}", $val);
+					$mlc_control_wk->write( "B${excel_ind}", $val);
 				}
 				++$excel_ind;
 				++$excel_ind_2;

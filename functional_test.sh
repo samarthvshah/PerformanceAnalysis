@@ -87,13 +87,13 @@ if [ "$stressmemvar" = "" ]; then
 fi
 
 if [ "$stressthreadvar" = "-1" ]; then
-	stressapptest -s 2000 -M $stressmemvar -W -v 4 >> $file
+	stressapptest -s 1200 -M $stressmemvar -W -v 4 >> $file
 
 elif [ "$stressthreadvar" = "" ]; then
-	stressapptest -s 2000 -M $stressmemvar -W -m 31 -v 4 >> $file
+	stressapptest -s 1200 -M $stressmemvar -W -m 31 -v 4 >> $file
 
 else
-	stressapptest -s 2000 -M $stressmemvar -W -m "$stressthreadvar" -v 4 >> $file
+	stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4 >> $file
 	
 fi	
 		
@@ -123,7 +123,7 @@ echo "\n\nMultiload Latency:\n" >> $file
 echo "\n\nMultiload Loaded Latency:\n" >> $file
 ./src/multichase/multiload -s 16 -n 5 -t "${threads}" -m 512M -c chaseload -l stream-sum >> $file
 echo "\n\nMultiload Bandwidth:\n" >> $file
-./src/multichase/multiload -a -c chaseload -l memcpy-libc -m 1g -s 256 -n 30 -v -t "${threads}" >> $file
+./src/multichase/multiload -a -c chaseload -l memcpy-libc -m 1g -s 256 -n 30 -t "${threads}" >> $file
 echo "\n\nFairness Latency:\n" >> $file
 ./src/multichase/fairness >> $file
 #echo "\n\nPingpong Latency:\n" >> $file

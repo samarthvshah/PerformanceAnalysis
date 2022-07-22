@@ -114,13 +114,13 @@ do
 		fi
 		
 		if [ "$stressthreadvar" = "-1" ]; then
-			stressapptest -s 2000 -M $stressmemvar -W  -v 4 >> $file
+			stressapptest -s 1200 -M $stressmemvar -W  -v 4 >> $file
 
 		elif [ "$stressthreadvar" = "" ]; then
-			stressapptest -s 2000 -M $stressmemvar -W -m 31 -v 4  >> $file
+			stressapptest -s 1200 -M $stressmemvar -W -m 31 -v 4  >> $file
 
 		else
-			stressapptest -s 2000 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
+			stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
 			
 		fi
 		
@@ -188,7 +188,7 @@ do
 	elif [ "$workload" = "mlc" ]; then
 	
 		echo "\n\n\n\nIntel Memory Latency Checker (MLC):\n\n" >> $file
-		./src/mlc_v3.9a/Linux/mlc >> $file
+		sudo ./src/mlc_v3.9a/Linux/mlc >> $file
 	
 	else
 		echo "Invalid Parameter $workload"

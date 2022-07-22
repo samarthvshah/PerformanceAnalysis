@@ -123,13 +123,13 @@ do
 		fi
 		
 		if [ "$stressthreadvar" = "-1" ]; then
-			numactl --cpunodebind=$control_node stressapptest -s 2000 -M $stressmemvar -W -v 4 >> $file
+			numactl --cpunodebind=$control_node stressapptest -s 1200 -M $stressmemvar -W -v 4 >> $file
 
 		elif [ "$stressthreadvar" = "" ]; then
-			numactl --cpunodebind=$control_node stressapptest -s 2000 -M $stressmemvar -W -m 31 -v 4  >> $file
+			numactl --cpunodebind=$control_node stressapptest -s 1200 -M $stressmemvar -W -m 31 -v 4  >> $file
 
 		else
-			numactl --cpunodebind=$control_node stressapptest -s 2000 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
+			numactl --cpunodebind=$control_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
 			
 		fi
 		
@@ -138,13 +138,13 @@ do
 		echo "\n\n\n\nStressAppTest (Memory Bandwidth and Latency) for the interest node $interest_node:\n" >> $file
 		
 		if [ "$stressthreadvar" = "-1" ]; then
-			numactl --cpunodebind=$interest_node stressapptest -s 2000 -M $stressmemvar -W -v 4 >> $file
+			numactl --cpunodebind=$interest_node stressapptest -s 1200 -M $stressmemvar -W -v 4 >> $file
 
 		elif [ "$stressthreadvar" = "" ]; then
-			numactl --cpunodebind=$interest_node stressapptest -s 2000 -M $stressmemvar -W -m 31 -v 4  >> $file
+			numactl --cpunodebind=$interest_node stressapptest -s 1200 -M $stressmemvar -W -m 31 -v 4  >> $file
 
 		else
-			numactl --cpunodebind=$interest_node stressapptest -s 2000 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
+			numactl --cpunodebind=$interest_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
 			
 		fi
 		

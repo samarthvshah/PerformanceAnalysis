@@ -423,7 +423,7 @@ while( my $line = <$info>)
 				++$excel_ind;
 			}
 			
-			if (index($line, "Stats") != -1 || index($line, "Status") != -1) {
+			if (index($line, "Stats") != -1) {
 				$stat_ind = index($line, "Stats");
 				$line = substr($line, $stat_ind);
 				
@@ -447,7 +447,12 @@ while( my $line = <$info>)
 					}
 				}
 				++$excel_ind;
-			}		
+			}	
+			
+			if (index($line, "Status") != -1) {
+				$stress_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $basic_centered_format);
+				++$excel_ind;
+			}
 		}
 	# Numa maps parsing
 	} elsif ($state eq "numamaps") {

@@ -123,13 +123,13 @@ do
 		fi
 		
 		if [ "$stressthreadvar" = "-1" ]; then
-			numactl --cpunodebind=$control_node stressapptest -s 2000 -M $stressmemvar -W -v 4 >> $file
+			numactl --cpunodebind=$control_node stressapptest -s 1200 -M $stressmemvar -W -v 4 >> $file
 
 		elif [ "$stressthreadvar" = "" ]; then
-			numactl --cpunodebind=$control_node stressapptest -s 2000 -M $stressmemvar -W -m 1 -v 4  >> $file
+			numactl --cpunodebind=$control_node stressapptest -s 1200 -M $stressmemvar -W -m 1 -v 4  >> $file
 
 		else
-			numactl --cpunodebind=$control_node stressapptest -s 2000 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
+			numactl --cpunodebind=$control_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
 			
 		fi
 		
@@ -138,13 +138,13 @@ do
 		echo "\n\n\n\nStressAppTest (Memory Bandwidth and Latency) for the interest node $interest_node:\n" >> $file
 		
 		if [ "$stressthreadvar" = "-1" ]; then
-			numactl --cpunodebind=$interest_node stressapptest -s 2000 -M $stressmemvar -W -v 4 >> $file
+			numactl --cpunodebind=$interest_node stressapptest -s 1200 -M $stressmemvar -W -v 4 >> $file
 
 		elif [ "$stressthreadvar" = "" ]; then
-			numactl --cpunodebind=$interest_node stressapptest -s 2000 -M $stressmemvar -W -m 1 -v 4  >> $file
+			numactl --cpunodebind=$interest_node stressapptest -s 1200 -M $stressmemvar -W -m 1 -v 4  >> $file
 
 		else
-			numactl --cpunodebind=$interest_node stressapptest -s 2000 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
+			numactl --cpunodebind=$interest_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
 			
 		fi
 		
@@ -240,11 +240,11 @@ do
 	
 		# MLC control node
 		echo "\n\n\n\nIntel Memory Latency Checker (MLC) for the control node $control_node:\n\n" >> $file
-		numactl --cpunodebind=$control_node ./src/mlc_v3.9a/Linux/mlc >> $file
+		sudo numactl --cpunodebind=$control_node ./src/mlc_v3.9a/Linux/mlc >> $file
 		
 		# MLC interest node
 		echo "\n\n\n\nIntel Memory Latency Checker (MLC) for the interest node $interest_node:\n\n" >> $file
-		numactl --cpunodebind=$interest_node ./src/mlc_v3.9a/Linux/mlc >> $file
+		sudo numactl --cpunodebind=$interest_node ./src/mlc_v3.9a/Linux/mlc >> $file
 		
 	else
 		echo "Invalid Parameter $workload"
