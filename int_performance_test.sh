@@ -178,7 +178,7 @@ do
 
 	elif [ "$workload" = "lmbench" ]; then
 		
-		cd src/lmbench-3.0-a9/
+		cd src/lmbench/
 		
 		make results
 		

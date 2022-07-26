@@ -1,20 +1,5 @@
 #!/bin/bash
 
-# Ask if the user wants to collect sensor data
-echo ""
-read -p "Do you want to collect sensor data? (yes or no, default is yes): " sensors
-
-# Setting default value
-if [ "$sensors" = "" ]; then
-	sensors="yes"
-fi
-
-# Starting sensor data collection
-if [ "$sensors" = "yes" ]; then
-	sh sensor_data.sh &
-	sensor_process=$!
-fi
-
 # Script Start Date and Time (for use in file name)
 date=`date +"%m-%d-%y_%T"`
 file=Results/sys_info_report_${date}.txt
@@ -77,7 +62,3 @@ perl excel_conv.pl "$file" "" "$date"
 # Deleting the temp files needed for the excel files after they are inserted
 rm sys_topo_${date}.png
 
-# Ending sensor data collection
-if [ "$sensors" = "yes" ]; then
-	sudo kill $sensor_process
-fi

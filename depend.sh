@@ -199,14 +199,14 @@ sudo cpanm Excel::Writer::XLSX
 # Lmbench
 
 echo "Removing old lmbench and installing the newest version"
+echo "Removing old lmbench and installing the newest version\n" >> log/dependency_log_file_$date.txt 
 
-if [ -d "/src/lmbench-3.0-a9/" ]; then
-	rm -rf "src/lmbench-3.0-a9/"
+if [ -d "src/lmbench/" ]; then
+	rm -rf "src/lmbench/"
 fi
 
-wget -q -P src/ https://sourceforge.net/projects/lmbench/files/latest/download >> log/dependency_log_file_$date.txt
-tar -xf src/download -C src/ >> log/dependency_log_file_$date.txt
-rm src/download >> log/dependency_log_file_$date.txt
+git clone https://github.com/zoybai/lmbench.git src/lmbench >> log/dependency_log_file_$date.txt
+
 
 # MLC
 
