@@ -11,7 +11,7 @@ fi
 
 # Starting sensor data collection
 if [ "$sensors" = "yes" ]; then
-	sh sensor_data.sh &
+	sh scripts/sensor_data.sh &
 	sensor_process=$!
 fi
 
@@ -132,7 +132,7 @@ echo "\n\nFairness Latency:\n" >> $file
 
 
 # Call the perl script to convert the txt report file to an excel file that is easier to read
-perl excel_conv.pl "$file" "stress,multichase" "$date"
+perl scripts/excel_conv.pl "$file" "stress,multichase" "$date"
 
 # Deleting the temp files needed for the excel files after they are inserted
 rm sys_topo_${date}.png

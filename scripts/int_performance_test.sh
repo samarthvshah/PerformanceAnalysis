@@ -23,7 +23,7 @@ fi
 
 # Starting sensor data collection
 if [ "$sensors" = "yes" ]; then
-	sh sensor_data.sh &
+	sh scripts/sensor_data.sh &
 	sensor_process=$!
 fi
 
@@ -128,7 +128,7 @@ do
 	
 		# STREAM
 		echo "\n\n\n\nSTREAM (Memory Bandwidth):\n" >> $file
-		./src/Stream/stream >> $file
+		sudo ./src/Stream/stream >> $file
 		
 	elif [ "$workload" = "fio" ]; then
 	
@@ -196,7 +196,7 @@ do
 done
 
 # Call the perl script to convert the txt report file to an excel file that is easier to read
-perl excel_conv.pl "$file" "$workloads" "$date"
+perl scripts/excel_conv.pl "$file" "$workloads" "$date"
 
 # Deleting the temp files needed for the excel files after they are inserted
 rm sys_topo_${date}.png

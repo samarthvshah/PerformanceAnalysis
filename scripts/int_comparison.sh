@@ -46,7 +46,7 @@ fi
 
 # Starting sensor data collection
 if [ "$sensors" = "yes" ]; then
-	sh sensor_data.sh &
+	sh scripts/sensor_data.sh &
 	sensor_process=$!
 fi
 
@@ -254,7 +254,7 @@ done
 IFS=$OIFS
 
 # Call the perl script to convert the txt report file to an excel file that is easier to read
-perl comp_excel_conv.pl "$file" "$workloads" "$date" "$control_node" "$interest_node"
+perl scripts/comp_excel_conv.pl "$file" "$workloads" "$date" "$control_node" "$interest_node"
 
 # Deleting the temp files needed for the excel files after they are inserted
 rm sys_topo_${date}.png

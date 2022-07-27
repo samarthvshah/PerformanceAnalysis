@@ -57,7 +57,7 @@ lstopo sys_topo_${date}.png
 
 
 # Call the perl script to convert the txt report file to an excel file that is easier to read
-perl excel_conv.pl "$file" "" "$date"
+perl scripts/excel_conv.pl "$file" "" "$date"
 
 # Deleting the temp files needed for the excel files after they are inserted
 rm sys_topo_${date}.png
