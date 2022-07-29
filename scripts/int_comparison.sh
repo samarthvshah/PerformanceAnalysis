@@ -54,50 +54,50 @@ fi
 echo "CPU INFO:\n\n" > $file
 
 # CPU INFO
-echo "cat:\n" >> $file
+echo "cat (cat /proc/cpuinfo):\n" >> $file
 cat /proc/cpuinfo >> $file
 
 # LSCPU INFO
-echo "\nlscpu:\n" >> $file
+echo "\nlscpu (lscpu):\n" >> $file
 lscpu >> $file
 
 # Memory Info
-echo "\n\n\n\nMEMORY INFO:" >> $file
+echo "\n\n\n\nMEMORY INFO (sudo lshw -C memory):" >> $file
 sudo lshw -C memory >> $file
 
 # OS Info
-echo "\n\n\n\nOS INFO:" >> $file
+echo "\n\n\n\nOS INFO (cat /etc/lsb-release, uname -r):" >> $file
 uname -a >> $file
 echo "" >> $file
 cat /etc/lsb-release >> $file
 echo "kernel=`uname -r`" >> $file
 
 #BIOS Info
-echo "\n\n\n\nBIOS INFO:" >> $file
+echo "\n\n\n\nBIOS INFO (sudo dmidecode --type bios):" >> $file
 sudo dmidecode --type bios >> $file
 
 # BMC Info
-echo "\n\n\n\nBMC INFO:" >> $file
+echo "\n\n\n\nBMC INFO (sudo ipmitool bmc info, sudo ipmitool lan print | grep \"IP Address\"):" >> $file
 sudo ipmitool bmc info >> $file
 sudo ipmitool lan print | grep "IP Address" >> $file
 
 # Numastat
-echo "\n\n\n\nNumastat:\n" >> $file
+echo "\n\n\n\nNumastat (numastat -n):\n" >> $file
 numastat -n >> $file
 
 # Numactl
 echo "\n\n\n\nNumactl:\n\n" >> $file
-echo "Numa Hardware Info:\n" >> $file
+echo "Numa Hardware Info (numactl --hardware):\n" >> $file
 numactl --hardware >> $file
-echo "\n\nNuma Policy Info:\n" >> $file
+echo "\n\nNuma Policy Info (numactl --show):\n" >> $file
 numactl --show >> $file
 
 # Numa maps
-echo "\n\n\n\nNuma Maps:\n" >> $file
+echo "\n\n\n\nNuma Maps (cat /proc/self/numa_maps):\n" >> $file
 cat /proc/self/numa_maps >> $file
 
-# Lstopo-no-graphics (System Topology):
-echo "\n\n\n\nLstopo-no-graphics (System Topology):\n" >> $file
+# System Topology (lstopo-no-graphics):
+echo "\n\n\n\nSystem Topology (lstopo-no-graphics):\n" >> $file
 lstopo-no-graphics >> $file
 lstopo sys_topo_${date}.png
 
@@ -123,12 +123,15 @@ do
 		fi
 		
 		if [ "$stressthreadvar" = "-1" ]; then
+			echo "numactl --cpunodebind=$control_node stressapptest -s 1200 -M $stressmemvar -W -v 4" >> $file
 			numactl --cpunodebind=$control_node stressapptest -s 1200 -M $stressmemvar -W -v 4 >> $file
 
 		elif [ "$stressthreadvar" = "" ]; then
+			echo "numactl --cpunodebind=$control_node stressapptest -s 1200 -M $stressmemvar -W -m 1 -v 4" >> $file
 			numactl --cpunodebind=$control_node stressapptest -s 1200 -M $stressmemvar -W -m 1 -v 4  >> $file
 
 		else
+			echo "numactl --cpunodebind=$control_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4" >> $file
 			numactl --cpunodebind=$control_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
 			
 		fi
@@ -138,12 +141,15 @@ do
 		echo "\n\n\n\nStressAppTest (Memory Bandwidth and Latency) for the interest node $interest_node:\n" >> $file
 		
 		if [ "$stressthreadvar" = "-1" ]; then
+			echo "numactl --cpunodebind=$interest_node stressapptest -s 1200 -M $stressmemvar -W -v 4" >> $file
 			numactl --cpunodebind=$interest_node stressapptest -s 1200 -M $stressmemvar -W -v 4 >> $file
 
 		elif [ "$stressthreadvar" = "" ]; then
+			echo "numactl --cpunodebind=$interest_node stressapptest -s 1200 -M $stressmemvar -W -m 1 -v 4" >> $file
 			numactl --cpunodebind=$interest_node stressapptest -s 1200 -M $stressmemvar -W -m 1 -v 4  >> $file
 
 		else
+			echo "numactl --cpunodebind=$interest_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4" >> $file
 			numactl --cpunodebind=$interest_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
 			
 		fi
@@ -151,17 +157,18 @@ do
 	elif [ "$workload" = "stream" ]; then
 	
 		# STREAM on the control node
-		echo "\n\n\n\nSTREAM (Memory Bandwidth) for the control node $control_node:\n" >> $file
+		echo "\n\n\n\nSTREAM (numactl --cpunodebind=$control_node ./src/Stream/stream) for the control node $control_node:\n" >> $file
 		numactl --cpunodebind=$control_node ./src/Stream/stream >> $file
 		
 		# STREAM interest node
-		echo "\n\n\n\nSTREAM (Memory Bandwidth) for the interest node $interest_node:\n" >> $file
+		echo "\n\n\n\nSTREAM (numactl --cpunodebind=$interest_node ./src/Stream/stream) for the interest node $interest_node:\n" >> $file
 		numactl --cpunodebind=$interest_node ./src/Stream/stream >> $file
 		
 	elif [ "$workload" = "fio" ]; then
 	
 		# Flexible I/O tester (Latency Test) on the control node
 		echo "\n\n\n\nFlexible I/O Tester for the control node $control_node:\n\n" >> $file
+		echo "numactl --cpunodebind=$control_node fio --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=120 --size=128M --numjobs=1" >> $file
 		echo "Latency Test:\n" >> $file
 		
 		# Create a csv version of the timing data
@@ -176,6 +183,7 @@ do
 		
 		# Flexible I/O tester (Latency Test) on the interest node
 		echo "\n\n\n\nFlexible I/O Tester for the interest node $interest_node:\n\n" >> $file
+		echo "numactl --cpunodebind=$interest_node fio --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=120 --size=128M --numjobs=1" >> $file
 		echo "Latency Test:\n" >> $file
 		
 		# Create a csv version of the timing data
@@ -205,16 +213,16 @@ do
 		
 		echo "\n\n\n\nFull Multichase and Multiload for the control node $control_node:\n\n" >> $file
 	
-		# Multichase tests
-		echo "Pointer Chase:\n" >> $file
+				# Multichase tests
+		echo "Pointer Chase (numactl --cpunodebind=$control_node ./src/multichase/multichase -a -s 256 -m 1g -c simple -n 30):\n" >> $file
 		numactl --cpunodebind=$control_node ./src/multichase/multichase -a -s 256 -m 1g -c simple -n 30 >> $file
-		echo "\n\nMultiload Latency:\n" >> $file
+		echo "\n\nMultiload Latency (numactl --cpunodebind=$control_node ./src/multichase/multiload):\n" >> $file
 		numactl --cpunodebind=$control_node ./src/multichase/multiload >> $file
-		echo "\n\nMultiload Loaded Latency:\n" >> $file
-		numactl --cpunodebind=$control_node ./src/multichase/multiload -s 16 -n 5 -t "${threads}" -m 512M -c chaseload -l stream-sum >> $file
-		echo "\n\nMultiload Bandwidth:\n" >> $file
-		numactl --cpunodebind=$control_node ./src/multichase/multiload -a -c chaseload -l memcpy-libc -m 1g -s 256 -n 30 -t "${threads}" >> $file
-		echo "\n\nFairness Latency:\n" >> $file
+		echo "\n\nMultiload Loaded Latency (numactl --cpunodebind=$control_node ./src/multichase/multiload -s 16 -n 5 -t ${threads} -m 512M -c chaseload -l stream-sum):\n" >> $file
+		numactl --cpunodebind=$control_node ./src/multichase/multiload -s 16 -n 5 -t ${threads} -m 512M -c chaseload -l stream-sum >> $file
+		echo "\n\nMultiload Bandwidth (numactl --cpunodebind=$control_node ./src/multichase/multiload -a -c chaseload -l memcpy-libc -m 1g -s 256 -n 30 -t ${threads}):\n" >> $file
+		numactl --cpunodebind=$control_node ./src/multichase/multiload -a -c chaseload -l memcpy-libc -m 1g -s 256 -n 30 -t ${threads} >> $file
+		echo "\n\nFairness Latency (numactl --cpunodebind=$control_node ./src/multichase/fairness):\n" >> $file
 		numactl --cpunodebind=$control_node ./src/multichase/fairness >> $file
 		#echo "\n\nPingpong Latency:\n" >> $file
 		#numactl --cpunodebind=$control_node ./src/multichase-master/pingpong -u >> $file
@@ -223,27 +231,27 @@ do
 		echo "\n\n\n\nFull Multichase and Multiload for the interest node $interest_node:\n\n" >> $file
 	
 		# Multichase tests
-		echo "Pointer Chase:\n" >> $file
+		echo "Pointer Chase (numactl --cpunodebind=$interest_node ./src/multichase/multichase -a -s 256 -m 1g -c simple -n 30):\n" >> $file
 		numactl --cpunodebind=$interest_node ./src/multichase/multichase -a -s 256 -m 1g -c simple -n 30 >> $file
-		echo "\n\nMultiload Latency:\n" >> $file
+		echo "\n\nMultiload Latency (numactl --cpunodebind=$interest_node ./src/multichase/multiload):\n" >> $file
 		numactl --cpunodebind=$interest_node ./src/multichase/multiload >> $file
-		echo "\n\nMultiload Loaded Latency:\n" >> $file
-		numactl --cpunodebind=$interest_node ./src/multichase/multiload -s 16 -n 5 -t "${threads}" -m 512M -c chaseload -l stream-sum >> $file
-		echo "\n\nMultiload Bandwidth:\n" >> $file
-		numactl --cpunodebind=$interest_node ./src/multichase/multiload -a -c chaseload -l memcpy-libc -m 1g -s 256 -n 30 -t "${threads}" >> $file
-		echo "\n\nFairness Latency:\n" >> $file
+		echo "\n\nMultiload Loaded Latency (numactl --cpunodebind=$interest_node ./src/multichase/multiload -s 16 -n 5 -t ${threads} -m 512M -c chaseload -l stream-sum):\n" >> $file
+		numactl --cpunodebind=$interest_node ./src/multichase/multiload -s 16 -n 5 -t ${threads} -m 512M -c chaseload -l stream-sum >> $file
+		echo "\n\nMultiload Bandwidth (numactl --cpunodebind=$interest_node ./src/multichase/multiload -a -c chaseload -l memcpy-libc -m 1g -s 256 -n 30 -t ${threads}):\n" >> $file
+		numactl --cpunodebind=$interest_node ./src/multichase/multiload -a -c chaseload -l memcpy-libc -m 1g -s 256 -n 30 -t ${threads} >> $file
+		echo "\n\nFairness Latency (numactl --cpunodebind=$interest_node ./src/multichase/fairness):\n" >> $file
 		numactl --cpunodebind=$interest_node ./src/multichase/fairness >> $file
 		#echo "\n\nPingpong Latency:\n" >> $file
-		#numactl --cpunodebind=$control_node ./src/multichase-master/pingpong -u >> $file
-			
+		#numactl --cpunodebind=$interest_node ./src/multichase-master/pingpong -u >> $file
+
 	elif [ "$workload" = "mlc" ]; then
 	
 		# MLC control node
-		echo "\n\n\n\nIntel Memory Latency Checker (MLC) for the control node $control_node:\n\n" >> $file
+		echo "\n\n\n\nIntel Memory Latency Checker (sudo numactl --cpunodebind=$control_node ./src/mlc_v3.9a/Linux/mlc) for the control node $control_node:\n\n" >> $file
 		sudo numactl --cpunodebind=$control_node ./src/mlc_v3.9a/Linux/mlc >> $file
 		
 		# MLC interest node
-		echo "\n\n\n\nIntel Memory Latency Checker (MLC) for the interest node $interest_node:\n\n" >> $file
+		echo "\n\n\n\nIntel Memory Latency Checker (sudo numactl --cpunodebind=$interest_node ./src/mlc_v3.9a/Linux/mlc) for the interest node $interest_node:\n\n" >> $file
 		sudo numactl --cpunodebind=$interest_node ./src/mlc_v3.9a/Linux/mlc >> $file
 		
 	else

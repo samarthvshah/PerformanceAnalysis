@@ -180,12 +180,12 @@ while( my $line = <$info>)
 		$file_ind = 1;
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
-	} elsif ($line eq "MEMORY INFO:") {
+	} elsif ($line eq "MEMORY INFO (sudo lshw -C memory):") {
 		$state = "meminfo";
 		$file_ind = 1;
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
-	} elsif ($line eq "OS INFO:") {
+	} elsif ($line eq "OS INFO (cat /etc/lsb-release, uname -r):") {
 		$state = "osinfo";
 		$file_ind = 1;
 		$excel_ind = 1;
@@ -202,12 +202,12 @@ while( my $line = <$info>)
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
 		$stress_interest_wk->set_row(6, 30);
-	} elsif ($line eq "STREAM (Memory Bandwidth) for the control node $control_node:") {
+	} elsif ($line eq "STREAM (numactl --cpunodebind=$control_node ./src/Stream/stream) for the control node $control_node:") {
 		$state = "stream_cont";
 		$file_ind = 1;
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
-	} elsif ($line eq "STREAM (Memory Bandwidth) for the interest node $interest_node:") {
+	} elsif ($line eq "STREAM (numactl --cpunodebind=$interest_node ./src/Stream/stream) for the interest node $interest_node:") {
 		$state = "stream_int";
 		$file_ind = 1;
 		$excel_ind = 1;
@@ -228,17 +228,17 @@ while( my $line = <$info>)
 		$file_ind = 1;
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
-	} elsif ($line eq "Numastat:") {
+	} elsif ($line eq "Numastat (numastat -n):") {
 		$state = "numastat";
 		$file_ind = 1;
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
-	} elsif ($line eq "Numa Maps:") {
+	} elsif ($line eq "Numa Maps (cat /proc/self/numa_maps):") {
 		$state = "numamaps";
 		$file_ind = 1;
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
-	} elsif ($line eq "Lstopo-no-graphics (System Topology):") {
+	} elsif ($line eq "System Topology (lstopo-no-graphics):") {
 		$state = "lstopo";
 		$file_ind = 1;
 		$excel_ind = 1;
@@ -253,24 +253,24 @@ while( my $line = <$info>)
 		$file_ind = 1;
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
-	} elsif ($line eq "BIOS INFO:") {
+	} elsif ($line eq "BIOS INFO (sudo dmidecode --type bios):") {
 		$state = "bios";
 		$file_ind = 1;
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
 		$state_2 = "not started";
-	} elsif ($line eq "BMC INFO:") {
+	} elsif ($line eq "BMC INFO (sudo ipmitool bmc info, sudo ipmitool lan print | grep \"IP Address\"):") {
 		$state = "bmc";
 		$file_ind = 1;
 		$excel_ind = 2;
 		$excel_ind_2 = 2;
-	} elsif ($line eq "Intel Memory Latency Checker (MLC) for the control node $control_node:") {
+	} elsif ($line eq "Intel Memory Latency Checker (sudo numactl --cpunodebind=$control_node ./src/mlc_v3.9a/Linux/mlc) for the control node $control_node:") {
 		$state = "mlc_cont";
 		$file_ind = 1;
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
 		$state_2 = "start";
-	} elsif ($line eq "Intel Memory Latency Checker (MLC) for the interest node $interest_node:") {
+	} elsif ($line eq "Intel Memory Latency Checker (sudo numactl --cpunodebind=$interest_node ./src/mlc_v3.9a/Linux/mlc) for the interest node $interest_node:") {
 		$state = "mlc_int";
 		$file_ind = 1;
 		$excel_ind = 1;
@@ -457,13 +457,13 @@ while( my $line = <$info>)
 			$stress_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $primary_header_format);
 			++$excel_ind;
 		# Important info that is only on one line
-		} elsif ($file_ind >= 3 && $file_ind < 6) {
+		} elsif ($file_ind >= 3 && $file_ind < 7) {
 			$stress_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $basic_centered_format);
 			++$excel_ind;
 		# Main data parsing
-		} elsif ($file_ind >= 6) {
+		} elsif ($file_ind >= 7) {
 		
-			if ($file_ind == 6) {
+			if ($file_ind == 7) {
 				$stress_control_wk->write( "A${excel_ind}", "Type", $secondary_header_format);
 				$stress_control_wk->write( "B${excel_ind}", "Total Amount", $secondary_header_format);
 				$stress_control_wk->write( "C${excel_ind}", "Bandwidth", $secondary_header_format);
@@ -506,13 +506,13 @@ while( my $line = <$info>)
 			$stress_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $primary_header_format);
 			++$excel_ind;
 		# Important info that is only on one line
-		} elsif ($file_ind >= 3 && $file_ind < 6) {
+		} elsif ($file_ind >= 3 && $file_ind < 7) {
 			$stress_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $basic_centered_format);
 			++$excel_ind;
 		# Main data parsing
-		} elsif ($file_ind >= 6) {
+		} elsif ($file_ind >= 7) {
 		
-			if ($file_ind == 6) {
+			if ($file_ind == 7) {
 				$stress_interest_wk->write( "A${excel_ind}", "Type", $secondary_header_format);
 				$stress_interest_wk->write( "B${excel_ind}", "Total Amount", $secondary_header_format);
 				$stress_interest_wk->write( "C${excel_ind}", "Bandwidth", $secondary_header_format);
@@ -720,9 +720,12 @@ while( my $line = <$info>)
 			
 			++$excel_ind;			
 		} elsif ($file_ind == 4) {
+			$fio_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 4, $line, $basic_centered_format);
+			++$excel_ind;
+		} elsif ($file_ind == 5) {
 			$fio_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 4, $line, $secondary_header_format);
 			++$excel_ind;
-		} elsif (($file_ind >= 12 && $file_ind < 16) || ($file_ind >= 22 && $file_ind < 28)) {
+		} elsif (($file_ind >= 13 && $file_ind < 17) || ($file_ind >= 23 && $file_ind < 29)) {
 			my ($key, $val) = split(/:/, $line);
 			$key =~ s/^\s*(.*?)\s*$/$1/;
 			$val =~ s/^\s*(.*?)\s*$/$1/;
@@ -741,7 +744,7 @@ while( my $line = <$info>)
 			$loop_index = 1;
 			
 			++$excel_ind;
-		} elsif ($file_ind == 16) {
+		} elsif ($file_ind == 17) {
 			$line =~ s/^\s+//;
 			$fio_control_wk->write(${excel_ind}-1, 0, $line)
 		} elsif ($file_ind >= 17 && $file_ind < 22) {
@@ -754,7 +757,7 @@ while( my $line = <$info>)
 				++$loop_index;
 			}
 			
-			if ($file_ind == 21) {
+			if ($file_ind == 22) {
 				++$excel_ind;	
 			}
 		}
@@ -766,9 +769,12 @@ while( my $line = <$info>)
 			
 			++$excel_ind;			
 		} elsif ($file_ind == 4) {
+			$fio_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 4, $line, $basic_centered_format);
+			++$excel_ind;
+		} elsif ($file_ind == 5) {
 			$fio_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 4, $line, $secondary_header_format);
 			++$excel_ind;
-		} elsif (($file_ind >= 12 && $file_ind < 16) || ($file_ind >= 22 && $file_ind < 28)) {
+		} elsif (($file_ind >= 13 && $file_ind < 17) || ($file_ind >= 23 && $file_ind < 29)) {
 			my ($key, $val) = split(/:/, $line);
 			$key =~ s/^\s*(.*?)\s*$/$1/;
 			$val =~ s/^\s*(.*?)\s*$/$1/;
@@ -787,10 +793,10 @@ while( my $line = <$info>)
 			$loop_index = 1;
 			
 			++$excel_ind;
-		} elsif ($file_ind == 16) {
+		} elsif ($file_ind == 17) {
 			$line =~ s/^\s+//;
 			$fio_interest_wk->write(${excel_ind}-1, 0, $line)
-		} elsif ($file_ind >= 17 && $file_ind < 22) {
+		} elsif ($file_ind >= 18 && $file_ind < 23) {
 			my @splits = split(/,/, $line);	
 			
 			foreach(@splits) {
@@ -800,7 +806,7 @@ while( my $line = <$info>)
 				++$loop_index;
 			}
 			
-			if ($file_ind == 21) {
+			if ($file_ind == 22) {
 				++$excel_ind;	
 			}
 		}

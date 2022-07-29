@@ -8,50 +8,50 @@ file=Results/sys_info_report_${date}.txt
 echo "CPU INFO:\n\n" > $file
 
 # CPU INFO
-echo "cat:\n" >> $file
+echo "cat (cat /proc/cpuinfo):\n" >> $file
 cat /proc/cpuinfo >> $file
 
 # LSCPU INFO
-echo "\nlscpu:\n" >> $file
+echo "\nlscpu (lscpu):\n" >> $file
 lscpu >> $file
 
 # Memory Info
-echo "\n\n\n\nMEMORY INFO:" >> $file
+echo "\n\n\n\nMEMORY INFO (sudo lshw -C memory):" >> $file
 sudo lshw -C memory >> $file
 
 # OS Info
-echo "\n\n\n\nOS INFO:" >> $file
+echo "\n\n\n\nOS INFO (cat /etc/lsb-release, uname -r):" >> $file
 uname -a >> $file
 echo "" >> $file
 cat /etc/lsb-release >> $file
 echo "kernel=`uname -r`" >> $file
 
 #BIOS Info
-echo "\n\n\n\nBIOS INFO:" >> $file
+echo "\n\n\n\nBIOS INFO (sudo dmidecode --type bios):" >> $file
 sudo dmidecode --type bios >> $file
 
 # BMC Info
-echo "\n\n\n\nBMC INFO:" >> $file
+echo "\n\n\n\nBMC INFO (sudo ipmitool bmc info, sudo ipmitool lan print | grep \"IP Address\"):" >> $file
 sudo ipmitool bmc info >> $file
 sudo ipmitool lan print | grep "IP Address" >> $file
 
 # Numastat
-echo "\n\n\n\nNumastat:\n" >> $file
+echo "\n\n\n\nNumastat (numastat -n):\n" >> $file
 numastat -n >> $file
 
 # Numactl
 echo "\n\n\n\nNumactl:\n\n" >> $file
-echo "Numa Hardware Info:\n" >> $file
+echo "Numa Hardware Info (numactl --hardware):\n" >> $file
 numactl --hardware >> $file
-echo "\n\nNuma Policy Info:\n" >> $file
+echo "\n\nNuma Policy Info (numactl --show):\n" >> $file
 numactl --show >> $file
 
 # Numa maps
-echo "\n\n\n\nNuma Maps:\n" >> $file
+echo "\n\n\n\nNuma Maps (cat /proc/self/numa_maps):\n" >> $file
 cat /proc/self/numa_maps >> $file
 
-# Lstopo-no-graphics (System Topology):
-echo "\n\n\n\nLstopo-no-graphics (System Topology):\n" >> $file
+# System Topology (lstopo-no-graphics):
+echo "\n\n\n\nSystem Topology (lstopo-no-graphics):\n" >> $file
 lstopo-no-graphics >> $file
 lstopo sys_topo_${date}.png
 

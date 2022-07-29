@@ -157,12 +157,12 @@ while( my $line = <$info>)
 		$file_ind = 1;
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
-	} elsif ($line eq "MEMORY INFO:") {
+	} elsif ($line eq "MEMORY INFO (sudo lshw -C memory):") {
 		$state = "meminfo";
 		$file_ind = 1;
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
-	} elsif ($line eq "OS INFO:") {
+	} elsif ($line eq "OS INFO (cat /etc/lsb-release, uname -r):") {
 		$state = "osinfo";
 		$file_ind = 1;
 		$excel_ind = 1;
@@ -173,7 +173,7 @@ while( my $line = <$info>)
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
 		$stress_wk->set_row(6, 30);
-	} elsif ($line eq "STREAM (Memory Bandwidth):") {
+	} elsif ($line eq "STREAM (./src/Stream/stream):") {
 		$state = "stream";
 		$file_ind = 1;
 		$excel_ind = 1;
@@ -191,17 +191,17 @@ while( my $line = <$info>)
 		$file_ind = 1;
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
-	} elsif ($line eq "Numastat:") {
+	} elsif ($line eq "Numastat (numastat -n):") {
 		$state = "numastat";
 		$file_ind = 1;
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
-	} elsif ($line eq "Numa Maps:") {
+	} elsif ($line eq "Numa Maps (cat /proc/self/numa_maps):") {
 		$state = "numamaps";
 		$file_ind = 1;
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
-	} elsif ($line eq "Lstopo-no-graphics (System Topology):") {
+	} elsif ($line eq "System Topology (lstopo-no-graphics):") {
 		$state = "lstopo";
 		$file_ind = 1;
 		$excel_ind = 1;
@@ -211,18 +211,18 @@ while( my $line = <$info>)
 		$file_ind = 1;
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
-	} elsif ($line eq "BIOS INFO:") {
+	} elsif ($line eq "BIOS INFO (sudo dmidecode --type bios):") {
 		$state = "bios";
 		$file_ind = 1;
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
 		$state_2 = "not started";
-	} elsif ($line eq "BMC INFO:") {
+	} elsif ($line eq "BMC INFO (sudo ipmitool bmc info, sudo ipmitool lan print | grep \"IP Address\"):") {
 		$state = "bmc";
 		$file_ind = 1;
 		$excel_ind = 2;
 		$excel_ind_2 = 2;
-	} elsif ($line eq "Intel Memory Latency Checker (MLC):") {
+	} elsif ($line eq "Intel Memory Latency Checker (sudo ./src/mlc_v3.9a/Linux/mlc):") {
 		$state = "mlc";
 		$file_ind = 1;
 		$excel_ind = 1;
@@ -250,9 +250,9 @@ while( my $line = <$info>)
 		} elsif ($file_ind >= 6) {
 		
 			# Setting cpu command state
-			if ($line eq "cat:") {
+			if ($line eq "cat (cat /proc/cpuinfo):") {
 				$state_2 = "cat";
-			} elsif ($line eq "lscpu:") {
+			} elsif ($line eq "lscpu (lscpu):") {
 				$state_2 = "ls";
 				$excel_ind_2 = 2;
 			}
@@ -356,7 +356,7 @@ while( my $line = <$info>)
 	} elsif ($state eq "bios") {	
 		$bios_info_wk->set_row(${excel_ind}-1, 30);
 		
-		if ($line eq "BIOS Information") {
+		if ($line eq "BIOS INFO (sudo dmidecode --type bios):") {
 			$state_2 = "started";
 		}
 		
@@ -384,7 +384,7 @@ while( my $line = <$info>)
 		$bmc_info_wk->set_row(${excel_ind}-1, 30);
 		
 		if ($file_ind == 1) {
-			$bmc_info_wk->merge_range( 0, 0, 0, 1, "BMC Information", $primary_header_format);
+			$bmc_info_wk->merge_range( 0, 0, 0, 1, "BMC INFO (sudo ipmitool bmc info):", $primary_header_format);
 		} else {		
 			my ($key, $val) = split(/:/, $line);
 				
@@ -408,14 +408,13 @@ while( my $line = <$info>)
 		if ($file_ind == 1) {
 			$stress_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $primary_header_format);
 			++$excel_ind;
-		# Important info that is only on one line
-		} elsif ($file_ind >= 3 && $file_ind < 6) {
+		} elsif ($file_ind >= 3 && $file_ind < 7) {
 			$stress_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $basic_centered_format);
 			++$excel_ind;
 		# Main data parsing
-		} elsif ($file_ind >= 6) {
+		} elsif ($file_ind >= 7) {
 		
-			if ($file_ind == 6) {
+			if ($file_ind == 7) {
 				$stress_wk->write( "A${excel_ind}", "Type", $secondary_header_format);
 				$stress_wk->write( "B${excel_ind}", "Total Amount", $secondary_header_format);
 				$stress_wk->write( "C${excel_ind}", "Bandwidth", $secondary_header_format);
@@ -490,14 +489,14 @@ while( my $line = <$info>)
 			++$excel_ind_2;
 		} elsif ($file_ind > 3) {
 			# Internal state switching
-			if ($line eq "Numa Policy Info:") {
+			if ($line eq "Numa Policy Info (numactl --show):") {
 				$state_2 = "policy";
 			}
 			
 			# If the numactl state is the hardware info
 			if ($state_2 eq "hw") {
 				# Hardware Header
-				if ($line eq "Numa Hardware Info:") {
+				if ($line eq "Numa Hardware Info (numactl --hardware):") {
 					$numactl_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 1, $line, $secondary_header_format);
 					++$excel_ind;
 				# Main data chunk
@@ -519,7 +518,7 @@ while( my $line = <$info>)
 				}
 			# If the numactl state is the numa policy info
 			} elsif ($state_2 eq "policy") {
-				if ($line eq "Numa Policy Info:") {
+				if ($line eq "Numa Policy Info (numactl --show):") {
 					$numactl_wk->merge_range( ${excel_ind_2}-1, 3, ${excel_ind_2}-1, 4, $line, $secondary_header_format);
 					++$excel_ind_2;
 				} elsif ($line ne "") {
@@ -602,9 +601,12 @@ while( my $line = <$info>)
 			
 			++$excel_ind;			
 		} elsif ($file_ind == 4) {
+			$fio_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 4, $line, $basic_centered_format);
+			++$excel_ind;
+		} elsif ($file_ind == 5) {
 			$fio_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 4, $line, $secondary_header_format);
 			++$excel_ind;
-		} elsif (($file_ind >= 12 && $file_ind < 16) || ($file_ind >= 22 && $file_ind < 28)) {
+		} elsif (($file_ind >= 13 && $file_ind < 17) || ($file_ind >= 23 && $file_ind < 29)) {
 			my ($key, $val) = split(/:/, $line);
 			$key =~ s/^\s*(.*?)\s*$/$1/;
 			$val =~ s/^\s*(.*?)\s*$/$1/;
@@ -623,10 +625,10 @@ while( my $line = <$info>)
 			$loop_index = 1;
 			
 			++$excel_ind;
-		} elsif ($file_ind == 16) {
+		} elsif ($file_ind == 17) {
 			$line =~ s/^\s+//;
 			$fio_wk->write(${excel_ind}-1, 0, $line)
-		} elsif ($file_ind >= 17 && $file_ind < 22) {
+		} elsif ($file_ind >= 18 && $file_ind < 23) {
 			my @splits = split(/,/, $line);	
 			
 			foreach(@splits) {
@@ -636,7 +638,7 @@ while( my $line = <$info>)
 				++$loop_index;
 			}
 			
-			if ($file_ind == 21) {
+			if ($file_ind == 22) {
 				++$excel_ind;	
 			}
 		}
@@ -648,10 +650,10 @@ while( my $line = <$info>)
 			++$excel_ind;
 		} elsif ($file_ind >= 4 && $file_ind < 8) {
 			if ($file_ind == 4) {
-				$multichase_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 1, $line, $secondary_header_format);
+				$multichase_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 3, $line, $secondary_header_format);
 				++$excel_ind;
 			} elsif ($file_ind == 6 || $file_ind == 7) {
-				$multichase_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 1, $line, $basic_centered_format);
+				$multichase_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 3, $line, $basic_centered_format);
 				++$excel_ind;
 			}
 
