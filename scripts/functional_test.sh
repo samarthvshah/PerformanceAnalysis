@@ -17,7 +17,7 @@ fi
 
 
 # Script Start Date and Time (for use in file name)
-date=`date +"%m-%d-%y_%T"`
+date=`date +"%m-%d-%y_%H-%M-%S"`
 file=Results/functional_report_${date}.txt
 
 # System Information
@@ -73,9 +73,21 @@ lstopo sys_topo_${date}.png
 	
 	
 # Workloads	
-	
-# StressAppTest
-echo "\n\n\n\nStressAppTest (Memory Bandwidth and Latency):\n" >> $file
+
+
+# Ask how long the user wants to stress the machine (short and long)
+echo ""
+read -p "How long do you want to run StressAppTest for a short amount of time (default is 20, with the input as the # of seconds): " short_time
+read -p "How long do you want to run StressAppTest for a long amount of time (default is 1200, with the input as the # of seconds): " long_time
+
+if [ "$short_time" = "" ]; then
+	short_time="20"
+fi
+
+if [ "$long_time" = "" ]; then
+	long_time="1200"
+fi
+
 
 # Get number of threads for StressAppTest
 echo ""
@@ -86,56 +98,43 @@ if [ "$stressmemvar" = "" ]; then
 	stressmemvar="40000"
 fi
 
+# StressAppTest Short
+echo "\n\n\n\nStressAppTest (Memory Bandwidth and Latency) Short:\n" >> $file
+
 if [ "$stressthreadvar" = "-1" ]; then
-	echo "stressapptest -s 1200 -M $stressmemvar -W -v 4" >> $file
-	stressapptest -s 1200 -M $stressmemvar -W -v 4 >> $file
+	echo "stressapptest -s $short_time -M $stressmemvar -W -v 4" >> $file
+	stressapptest -s $short_time -M $stressmemvar -W -v 4 >> $file
 
 elif [ "$stressthreadvar" = "" ]; then
-	echo "stressapptest -s 1200 -M $stressmemvar -W -m 31 -v 4" >> $file
-	stressapptest -s 1200 -M $stressmemvar -W -m 31 -v 4 >> $file
+	echo "stressapptest -s $short_time -M $stressmemvar -W -m 31 -v 4" >> $file
+	stressapptest -s $short_time -M $stressmemvar -W -m 31 -v 4 >> $file
 
 else
-	echo "stressapptest -s 1200 -M $stressmemvar -W -m $stressthreadvar" >> $file
-	stressapptest -s 1200 -M $stressmemvar -W -m $stressthreadvar -v 4 >> $file
+	echo "stressapptest -s $short_time -M $stressmemvar -W -m $stressthreadvar" >> $file
+	stressapptest -s $short_time -M $stressmemvar -W -m $stressthreadvar -v 4 >> $file
 	
-fi	
-		
-
-# Multichase
-echo "\n\n\n\nFull Multichase and Multiload:\n\n" >> $file
-
-# Get number of threads for multichase
-echo ""
-read -p "How many threads do you want to use for multichase (default is 8, enter -1 to use all the machines threads): " threadvar
-
-if [ "$threadvar" = "-1" ]; then
-	threads=`nproc`
-
-elif [ "$threadvar" = "" ]; then
-	threads=8
-
-else
-	threads=$threadvar
-
 fi
 
-echo "Pointer Chase (./src/multichase/multichase -a -s 256 -m 1g -c simple -n 30):\n" >> $file
-./src/multichase/multichase -a -s 256 -m 1g -c simple -n 30 >> $file
-echo "\n\nMultiload Latency (./src/multichase/multiload):\n" >> $file
-./src/multichase/multiload >> $file
-echo "\n\nMultiload Loaded Latency (./src/multichase/multiload -s 16 -n 5 -t ${threads} -m 512M -c chaseload -l stream-sum):\n" >> $file
-./src/multichase/multiload -s 16 -n 5 -t ${threads} -m 512M -c chaseload -l stream-sum >> $file
-echo "\n\nMultiload Bandwidth (./src/multichase/multiload -a -c chaseload -l memcpy-libc -m 1g -s 256 -n 30 -t ${threads}):\n" >> $file
-./src/multichase/multiload -a -c chaseload -l memcpy-libc -m 1g -s 256 -n 30 -t ${threads} >> $file
-echo "\n\nFairness Latency (./src/multichase/fairness):\n" >> $file
-./src/multichase/fairness >> $file
-#echo "\n\nPingpong Latency:\n" >> $file
-#./src/multichase-master/pingpong -u >> $file
+# StressAppTest Long
+echo "\n\n\n\nStressAppTest (Memory Bandwidth and Latency) Long:\n" >> $file
 
+if [ "$stressthreadvar" = "-1" ]; then
+	echo "stressapptest -s $long_time -M $stressmemvar -W -v 4" >> $file
+	stressapptest -s $long_time -M $stressmemvar -W -v 4 >> $file
 
+elif [ "$stressthreadvar" = "" ]; then
+	echo "stressapptest -s $long_time -M $stressmemvar -W -m 31 -v 4" >> $file
+	stressapptest -s $long_time -M $stressmemvar -W -m 31 -v 4 >> $file
 
+else
+	echo "stressapptest -s $long_time -M $stressmemvar -W -m $stressthreadvar" >> $file
+	stressapptest -s $long_time -M $stressmemvar -W -m $stressthreadvar -v 4 >> $file
+	
+fi
+
+		
 # Call the perl script to convert the txt report file to an excel file that is easier to read
-perl scripts/excel_conv.pl "$file" "stress,multichase" "$date"
+perl scripts/func_conv.pl "$file" "$date"
 
 # Deleting the temp files needed for the excel files after they are inserted
 rm sys_topo_${date}.png

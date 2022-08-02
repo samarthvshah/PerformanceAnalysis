@@ -6,7 +6,7 @@ use Excel::Writer::XLSX;
 
 # Getting the parameters passed in by the workload running script
 my ($reportfile, $workloadsstr, $date, $control_node, $interest_node) = @ARGV;
-my $filename = "Results/report_data_${date}.xlsx";
+my $filename = "Results/comparison_report_${date}.xlsx";
 my @workloads = split(/,/, $workloadsstr);
 my @states = ("cpuinfo", "meminfo", "osinfo", "biosinfo", "bmcinfo", "numastat", "numactl", "numamaps", "lstopo", @workloads);
 

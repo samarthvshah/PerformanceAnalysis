@@ -28,7 +28,7 @@ if [ "$sensors" = "yes" ]; then
 fi
 
 # Script Start Date and Time (for use in file name)
-date=`date +"%m-%d-%y_%T"`
+date=`date +"%m-%d-%y_%H-%M-%S"`
 file=Results/performance_report_${date}.txt
 
  System Information
@@ -203,7 +203,7 @@ do
 done
 
 # Call the perl script to convert the txt report file to an excel file that is easier to read
-perl scripts/excel_conv.pl "$file" "$workloads" "$date"
+perl scripts/excel_conv.pl "$file" "$workloads" "$date" "performance"
 
 # Deleting the temp files needed for the excel files after they are inserted
 rm sys_topo_${date}.png

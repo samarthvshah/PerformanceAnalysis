@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script Start Date and Time (for use in file name)
-date=`date +"%m-%d-%y_%T"`
+date=`date +"%m-%d-%y_%H-%M-%S"`
 file=Results/sys_info_report_${date}.txt
 
 # System Information
@@ -57,7 +57,7 @@ lstopo sys_topo_${date}.png
 
 
 # Call the perl script to convert the txt report file to an excel file that is easier to read
-perl scripts/excel_conv.pl "$file" "" "$date"
+perl scripts/excel_conv.pl "$file" "" "$date" "sys_info"
 
 # Deleting the temp files needed for the excel files after they are inserted
 rm sys_topo_${date}.png

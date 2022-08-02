@@ -5,8 +5,8 @@ use warnings;
 use Excel::Writer::XLSX;
 
 # Getting the parameters passed in by the workload running script
-my ($reportfile, $workloadsstr, $date) = @ARGV;
-my $filename = "Results/report_data_${date}.xlsx";
+my ($reportfile, $workloadsstr, $date, $type) = @ARGV;
+my $filename = "Results/${type}_report_${date}.xlsx";
 my @workloads = split(/,/, $workloadsstr);
 my @states = ("cpuinfo", "meminfo", "osinfo", "biosinfo", "bmcinfo", "numastat", "numactl", "numamaps", "lstopo", @workloads);
 
@@ -435,7 +435,13 @@ while( my $line = <$info>)
 		
 				if (defined $val) {
 					$val =~ s/^\s*(.*?)\s*$/$1/;
+
 					my ($total, $bandw) = split(/ at /, $val);
+										
+					if (defined $bandw) {
+						$total = substr( $total, 0, -1);
+						$bandw = substr( $bandw, 0, -4);
+					}
 					
 					if (defined $total) {
 						$stress_wk->write( "B${excel_ind}", $total);
@@ -451,6 +457,37 @@ while( my $line = <$info>)
 			if (index($line, "Status") != -1) {
 				$stress_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $basic_centered_format);
 				++$excel_ind;
+				
+				my $stress_band_data_chart = $workbook->add_chart( type => 'bar', name => 'Bandwidth Data', embedded => 1 );
+			
+				$stress_band_data_chart->add_series(
+					categories => '=StressAppTest!$A$9:$A$14',
+					values => '=StressAppTest!$C$9:$C$14',
+					name => 'Bandwidth',
+				);
+				
+				$stress_band_data_chart->set_y_axis( name => 'Type of Operation');
+				$stress_band_data_chart->set_x_axis( name => 'Bandwidth (mb/s)');
+				$stress_band_data_chart->set_legend( none => 1 );
+				$stress_band_data_chart->set_title( name => 'Bandwidth Data' );
+				
+				$stress_wk->insert_chart( 'A17', $stress_band_data_chart);
+				
+				
+				my $stress_total_data_chart = $workbook->add_chart( type => 'bar', name => 'Total Data', embedded => 1 );
+			
+				$stress_total_data_chart->add_series(
+					categories => '=StressAppTest!$A$9:$A$14',
+					values => '=StressAppTest!$B$9:$B$14',
+					name => 'Total Amount',
+				);
+				
+				$stress_total_data_chart->set_y_axis( name => 'Type of Operation');
+				$stress_total_data_chart->set_x_axis( name => 'Total Amount (mb)');
+				$stress_total_data_chart->set_legend( none => 1 );
+				$stress_total_data_chart->set_title( name => 'Total Amount Data' );
+				
+				$stress_wk->insert_chart( 'A32', $stress_total_data_chart);
 			}
 		}
 	# Numa maps parsing
@@ -592,6 +629,50 @@ while( my $line = <$info>)
 				++$loop_index;
 			}
 			++$excel_ind;
+		} elsif ($file_ind == 33) {
+		
+			my $stream_band_data_chart = $workbook->add_chart( type => 'bar', name => 'Bandwidth Data', embedded => 1 );
+			
+			$stream_band_data_chart->add_series(
+				categories => '=STREAM!$A$5:$A$8',
+				values => '=STREAM!$B$5:$B$8',
+				name => 'Best Rate',
+			);
+			
+			$stream_band_data_chart->set_y_axis( name => 'Type of Operation');
+			$stream_band_data_chart->set_x_axis( name => 'Bandwidth (mb/s)');
+			$stream_band_data_chart->set_legend( none => 1 );
+			$stream_band_data_chart->set_title( name => 'Bandwidth Data' );
+			
+			$stream_wk->insert_chart( 'A10', $stream_band_data_chart);
+			
+			
+			
+			my $stream_timing_data_chart = $workbook->add_chart( type => 'bar', name => 'Timing Data', embedded => 1 );
+		
+			$stream_timing_data_chart->add_series(
+				categories => '=STREAM!$A$5:$A$8',
+				values => '=STREAM!$D$5:$D$8',
+				name => 'Min Time',
+			);
+			
+			$stream_timing_data_chart->add_series(
+				categories => '=STREAM!$A$5:$A$8',
+				values => '=STREAM!$C$5:$C$8',
+				name => 'Avg Time',
+			);
+			
+			$stream_timing_data_chart->add_series(
+				categories => '=STREAM!$A$5:$A$8',
+				values => '=STREAM!$E$5:$E$8',
+				name => 'Max Time',
+			);
+			
+			$stream_timing_data_chart->set_y_axis( name => 'Type of Operation');
+			$stream_timing_data_chart->set_x_axis( name => 'Timing (sec)');
+			$stream_timing_data_chart->set_title( name => 'Timing Data' );
+			
+			$stream_wk->insert_chart( 'A25', $stream_timing_data_chart);
 		}
 	} elsif ($state eq "fio") {
 		$fio_wk->set_row( ${excel_ind}-1, 25);
