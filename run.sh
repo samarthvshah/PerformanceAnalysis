@@ -46,7 +46,7 @@ elif [ "$run" = "comp" ]; then
 		echo ""
 		read -p "What workloads do you want to run? (enter a comma-seperated list with stream for STREAM, stress for StressAppTest, fio for Flexible I/O tester, multichase for Multichase, lmbench for Lmbench, mlc for Intel Memory Latency Checker, all for All Workloads): " workloads
 		
-		sh scripts/int_comparison_test.sh "$workloads"
+		sh scripts/int_comparison.sh "$workloads"
 		
 	elif [ "$platform" = "amd" ]; then
 	
@@ -54,7 +54,7 @@ elif [ "$run" = "comp" ]; then
 		echo ""
 		read -p "What workloads do you want to run? (enter a comma-seperated list with stream for STREAM, stress for StressAppTest, fio for Flexible I/O tester, multichase for Multichase, lmbench for Lmbench, all for All Workloads): " workloads
 		
-		sh scripts/amd_comparison_test.sh "$workloads"	
+		sh scripts/amd_comparison.sh "$workloads"	
 	
 	fi
 	
