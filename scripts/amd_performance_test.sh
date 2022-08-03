@@ -115,15 +115,15 @@ do
 
 		if [ "$stressthreadvar" = "-1" ]; then
 			echo "stressapptest -s 1200 -M $stressmemvar -W -v 4" >> $file
-			stressapptest -s 10 -M $stressmemvar -W -v 4 >> $file
+			stressapptest -s 1200 -M $stressmemvar -W -v 4 >> $file
 
 		elif [ "$stressthreadvar" = "" ]; then
 			echo "stressapptest -s 1200 -M $stressmemvar -W -m 31 -v 4" >> $file
-			stressapptest -s 10 -M $stressmemvar -W -m 31 -v 4 >> $file
+			stressapptest -s 1200 -M $stressmemvar -W -m 31 -v 4 >> $file
 
 		else
 			echo "stressapptest -s 1200 -M $stressmemvar -W -m $stressthreadvar" >> $file
-			stressapptest -s 10 -M $stressmemvar -W -m $stressthreadvar -v 4 >> $file
+			stressapptest -s 1200 -M $stressmemvar -W -m $stressthreadvar -v 4 >> $file
 			
 		fi	
 
