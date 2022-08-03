@@ -177,8 +177,8 @@ do
 		./src/multichase/multiload >> $file
 		echo "\n\nMultiload Loaded Latency (./src/multichase/multiload -s 16 -n 5 -t ${threads} -m 512M -c chaseload -l stream-sum):\n" >> $file
 		./src/multichase/multiload -s 16 -n 5 -t ${threads} -m 512M -c chaseload -l stream-sum >> $file
-		echo "\n\nMultiload Bandwidth (./src/multichase/multiload -a -c chaseload -l memcpy-libc -m 1g -s 256 -n 30 -t ${threads}):\n" >> $file
-		./src/multichase/multiload -a -c chaseload -l memcpy-libc -m 1g -s 256 -n 30 -t ${threads} >> $file
+		echo "\n\nMultiload Bandwidth (./src/multichase/multiload -a -l memcpy-libc -m 1g -s 256 -n 30 -t ${threads}):\n" >> $file
+		./src/multichase/multiload -a -l memcpy-libc -m 1g -s 256 -n 30 -t ${threads} >> $file
 		echo "\n\nFairness Latency (./src/multichase/fairness):\n" >> $file
 		./src/multichase/fairness >> $file
 		#echo "\n\nPingpong Latency:\n" >> $file

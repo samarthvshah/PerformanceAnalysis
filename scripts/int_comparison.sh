@@ -39,7 +39,7 @@ fi
 
 # Initialize what workloads to run
 if [ "$1" = "all" ]; then
-	workloads="multichase,stress,stream,fio,mlc"
+	workloads="multichase,stress,stream,fio"
 else
 	workloads=$1
 fi
@@ -111,7 +111,7 @@ do
 
 		# Get number of threads for StressAppTest
 		echo ""
-		read -p "How many threads do you want to use for StressAppTest on the control node (default is 1, enter -1 to attempt usage of all the machines threads): " stressthreadvar
+		read -p "How many threads do you want to use for StressAppTest on the control node (default is 31, enter -1 to attempt usage of all the machines threads): " stressthreadvar
 		read -p "How much memory do you want to use for StressAppTest on the control node (default is 40000 -> 40gb the format is the # of megabytes): " stressmemvar
 		
 		
@@ -123,16 +123,16 @@ do
 		fi
 		
 		if [ "$stressthreadvar" = "-1" ]; then
-			echo "numactl --cpunodebind=$control_node stressapptest -s 1200 -M $stressmemvar -W -v 4" >> $file
-			numactl --cpunodebind=$control_node stressapptest -s 1200 -M $stressmemvar -W -v 4 >> $file
+			echo "numactl -m $control_node stressapptest -s 1200 -M $stressmemvar -W -v 4" >> $file
+			numactl -m $control_node stressapptest -s 10 -M $stressmemvar -W -v 4 >> $file
 
 		elif [ "$stressthreadvar" = "" ]; then
-			echo "numactl --cpunodebind=$control_node stressapptest -s 1200 -M $stressmemvar -W -m 1 -v 4" >> $file
-			numactl --cpunodebind=$control_node stressapptest -s 1200 -M $stressmemvar -W -m 1 -v 4  >> $file
+			echo "numactl -m $control_node stressapptest -s 1200 -M $stressmemvar -W -m 31 -v 4" >> $file
+			numactl -m $control_node stressapptest -s 10 -M $stressmemvar -W -m 31 -v 4  >> $file
 
 		else
-			echo "numactl --cpunodebind=$control_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4" >> $file
-			numactl --cpunodebind=$control_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
+			echo "numactl -m $control_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4" >> $file
+			numactl -m $control_node stressapptest -s 10 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
 			
 		fi
 		
@@ -141,41 +141,41 @@ do
 		echo "\n\n\n\nStressAppTest (Memory Bandwidth and Latency) for the interest node $interest_node:\n" >> $file
 		
 		if [ "$stressthreadvar" = "-1" ]; then
-			echo "numactl --cpunodebind=$interest_node stressapptest -s 1200 -M $stressmemvar -W -v 4" >> $file
-			numactl --cpunodebind=$interest_node stressapptest -s 1200 -M $stressmemvar -W -v 4 >> $file
+			echo "numactl -m $interest_node stressapptest -s 1200 -M $stressmemvar -W -v 4" >> $file
+			numactl -m $interest_node stressapptest -s 10 -M $stressmemvar -W -v 4 >> $file
 
 		elif [ "$stressthreadvar" = "" ]; then
-			echo "numactl --cpunodebind=$interest_node stressapptest -s 1200 -M $stressmemvar -W -m 1 -v 4" >> $file
-			numactl --cpunodebind=$interest_node stressapptest -s 1200 -M $stressmemvar -W -m 1 -v 4  >> $file
+			echo "numactl -m $interest_node stressapptest -s 1200 -M $stressmemvar -W -m 31 -v 4" >> $file
+			numactl -m $interest_node stressapptest -s 10 -M $stressmemvar -W -m 31 -v 4  >> $file
 
 		else
-			echo "numactl --cpunodebind=$interest_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4" >> $file
-			numactl --cpunodebind=$interest_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
+			echo "numactl -m $interest_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4" >> $file
+			numactl -m $interest_node stressapptest -s 10 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
 			
 		fi
 		
 	elif [ "$workload" = "stream" ]; then
 	
 		# STREAM on the control node
-		echo "\n\n\n\nSTREAM (numactl --cpunodebind=$control_node ./src/Stream/stream) for the control node $control_node:\n" >> $file
-		numactl --cpunodebind=$control_node ./src/Stream/stream >> $file
+		echo "\n\n\n\nSTREAM (numactl -m $control_node ./src/Stream/stream) for the control node $control_node:\n" >> $file
+		numactl -m $control_node ./src/Stream/stream >> $file
 		
 		# STREAM interest node
-		echo "\n\n\n\nSTREAM (numactl --cpunodebind=$interest_node ./src/Stream/stream) for the interest node $interest_node:\n" >> $file
-		numactl --cpunodebind=$interest_node ./src/Stream/stream >> $file
+		echo "\n\n\n\nSTREAM (numactl -m $interest_node ./src/Stream/stream) for the interest node $interest_node:\n" >> $file
+		numactl -m $interest_node ./src/Stream/stream >> $file
 		
 	elif [ "$workload" = "fio" ]; then
 	
 		# Flexible I/O tester (Latency Test) on the control node
 		echo "\n\n\n\nFlexible I/O Tester for the control node $control_node:\n\n" >> $file
-		echo "numactl --cpunodebind=$control_node fio --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=120 --size=128M --numjobs=1" >> $file
+		echo "numactl -m $control_node fio --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=120 --size=128M --numjobs=1" >> $file
 		echo "Latency Test:\n" >> $file
 		
 		# Create a csv version of the timing data
 #		fio_csv_creation
 		
 		# Run and output to report file
-		numactl --cpunodebind=$control_node fio --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=120 --size=128M --numjobs=1 >> $file
+		numactl -m $control_node fio --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=120 --size=128M --numjobs=1 >> $file
 #		fio_generate_plots "Read Test" 800 600
 		
 		# Delete job file
@@ -183,14 +183,14 @@ do
 		
 		# Flexible I/O tester (Latency Test) on the interest node
 		echo "\n\n\n\nFlexible I/O Tester for the interest node $interest_node:\n\n" >> $file
-		echo "numactl --cpunodebind=$interest_node fio --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=120 --size=128M --numjobs=1" >> $file
+		echo "numactl -m $interest_node fio --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=120 --size=128M --numjobs=1" >> $file
 		echo "Latency Test:\n" >> $file
 		
 		# Create a csv version of the timing data
 #		fio_csv_creation
 		
 		# Run and output to report file
-		numactl --cpunodebind=$interest_node fio --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=120 --size=128M --numjobs=1 >> $file
+		numactl -m $interest_node fio --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=120 --size=128M --numjobs=1 >> $file
 #		fio_generate_plots "Read Test" 800 600
 		
 		# Delete job file
@@ -200,12 +200,12 @@ do
 	
 		# Get number of threads for multichase
 		echo ""
-		read -p "How many threads do you want to use for multichase on the control node (default is 1, enter -1 to attempt usage of all the machines threads): " threadvar
+		read -p "How many threads do you want to use for multichase on the control node (default is 8, enter -1 to attempt usage of all the machines threads): " threadvar
 		
 		if [ "$threadvar" = "-1" ]; then
 			threads=`nproc`
 		elif [ "$threadvar" = "" ]; then
-			threads=1
+			threads=8
 		else
 			threads=$threadvar
 		fi
@@ -213,17 +213,17 @@ do
 		
 		echo "\n\n\n\nFull Multichase and Multiload for the control node $control_node:\n\n" >> $file
 	
-				# Multichase tests
-		echo "Pointer Chase (numactl --cpunodebind=$control_node ./src/multichase/multichase -a -s 256 -m 1g -c simple -n 30):\n" >> $file
-		numactl --cpunodebind=$control_node ./src/multichase/multichase -a -s 256 -m 1g -c simple -n 30 >> $file
-		echo "\n\nMultiload Latency (numactl --cpunodebind=$control_node ./src/multichase/multiload):\n" >> $file
-		numactl --cpunodebind=$control_node ./src/multichase/multiload >> $file
-		echo "\n\nMultiload Loaded Latency (numactl --cpunodebind=$control_node ./src/multichase/multiload -s 16 -n 5 -t ${threads} -m 512M -c chaseload -l stream-sum):\n" >> $file
-		numactl --cpunodebind=$control_node ./src/multichase/multiload -s 16 -n 5 -t ${threads} -m 512M -c chaseload -l stream-sum >> $file
-		echo "\n\nMultiload Bandwidth (numactl --cpunodebind=$control_node ./src/multichase/multiload -a -c chaseload -l memcpy-libc -m 1g -s 256 -n 30 -t ${threads}):\n" >> $file
-		numactl --cpunodebind=$control_node ./src/multichase/multiload -a -c chaseload -l memcpy-libc -m 1g -s 256 -n 30 -t ${threads} >> $file
-		echo "\n\nFairness Latency (numactl --cpunodebind=$control_node ./src/multichase/fairness):\n" >> $file
-		numactl --cpunodebind=$control_node ./src/multichase/fairness >> $file
+		# Multichase tests
+		echo "Pointer Chase (numactl -m $control_node ./src/multichase/multichase -a -s 256 -m 1g -c simple -n 30):\n" >> $file
+		numactl -m $control_node ./src/multichase/multichase -a -s 256 -m 1g -c simple -n 30 >> $file
+		echo "\n\nMultiload Latency (numactl -m $control_node ./src/multichase/multiload):\n" >> $file
+		numactl -m $control_node ./src/multichase/multiload >> $file
+		echo "\n\nMultiload Loaded Latency (numactl -m $control_node ./src/multichase/multiload -s 16 -n 5 -t ${threads} -m 512M -c chaseload -l stream-sum):\n" >> $file
+		numactl -m $control_node ./src/multichase/multiload -s 16 -n 5 -t ${threads} -m 512M -c chaseload -l stream-sum >> $file
+		echo "\n\nMultiload Bandwidth (numactl -m $control_node ./src/multichase/multiload -a -l memcpy-libc -m 1g -s 256 -n 30 -t ${threads}):\n" >> $file
+		numactl -m $control_node ./src/multichase/multiload -a -l memcpy-libc -m 1g -s 256 -n 30 -t ${threads} >> $file
+		echo "\n\nFairness Latency (numactl -m $control_node ./src/multichase/fairness):\n" >> $file
+		numactl -m $control_node ./src/multichase/fairness >> $file
 		#echo "\n\nPingpong Latency:\n" >> $file
 		#numactl --cpunodebind=$control_node ./src/multichase-master/pingpong -u >> $file
 		
@@ -231,28 +231,28 @@ do
 		echo "\n\n\n\nFull Multichase and Multiload for the interest node $interest_node:\n\n" >> $file
 	
 		# Multichase tests
-		echo "Pointer Chase (numactl --cpunodebind=$interest_node ./src/multichase/multichase -a -s 256 -m 1g -c simple -n 30):\n" >> $file
-		numactl --cpunodebind=$interest_node ./src/multichase/multichase -a -s 256 -m 1g -c simple -n 30 >> $file
-		echo "\n\nMultiload Latency (numactl --cpunodebind=$interest_node ./src/multichase/multiload):\n" >> $file
-		numactl --cpunodebind=$interest_node ./src/multichase/multiload >> $file
-		echo "\n\nMultiload Loaded Latency (numactl --cpunodebind=$interest_node ./src/multichase/multiload -s 16 -n 5 -t ${threads} -m 512M -c chaseload -l stream-sum):\n" >> $file
-		numactl --cpunodebind=$interest_node ./src/multichase/multiload -s 16 -n 5 -t ${threads} -m 512M -c chaseload -l stream-sum >> $file
-		echo "\n\nMultiload Bandwidth (numactl --cpunodebind=$interest_node ./src/multichase/multiload -a -c chaseload -l memcpy-libc -m 1g -s 256 -n 30 -t ${threads}):\n" >> $file
-		numactl --cpunodebind=$interest_node ./src/multichase/multiload -a -c chaseload -l memcpy-libc -m 1g -s 256 -n 30 -t ${threads} >> $file
-		echo "\n\nFairness Latency (numactl --cpunodebind=$interest_node ./src/multichase/fairness):\n" >> $file
-		numactl --cpunodebind=$interest_node ./src/multichase/fairness >> $file
+		echo "Pointer Chase (numactl -m $interest_node ./src/multichase/multichase -a -s 256 -m 1g -c simple -n 30):\n" >> $file
+		numactl -C 0 -m $interest_node ./src/multichase/multichase -a -s 256 -m 1g -c simple -n 30 >> $file
+		echo "\n\nMultiload Latency (numactl -m $interest_node ./src/multichase/multiload):\n" >> $file
+		numactl -m $interest_node ./src/multichase/multiload >> $file
+		echo "\n\nMultiload Loaded Latency (numactl -m $interest_node ./src/multichase/multiload -s 16 -n 5 -t ${threads} -m 512M -c chaseload -l stream-sum):\n" >> $file
+		numactl -m $interest_node ./src/multichase/multiload -s 16 -n 5 -t ${threads} -m 512M -c chaseload -l stream-sum >> $file
+		echo "\n\nMultiload Bandwidth (numactl -m $interest_node ./src/multichase/multiload -a -l memcpy-libc -m 1g -s 256 -n 30 -t ${threads}):\n" >> $file
+		numactl -m $interest_node ./src/multichase/multiload -a -l memcpy-libc -m 1g -s 256 -n 30 -t ${threads} >> $file
+		echo "\n\nFairness Latency (numactl -m $interest_node ./src/multichase/fairness):\n" >> $file
+		numactl -m $interest_node ./src/multichase/fairness >> $file
 		#echo "\n\nPingpong Latency:\n" >> $file
 		#numactl --cpunodebind=$interest_node ./src/multichase-master/pingpong -u >> $file
 
 	elif [ "$workload" = "mlc" ]; then
 	
 		# MLC control node
-		echo "\n\n\n\nIntel Memory Latency Checker (sudo numactl --cpunodebind=$control_node ./src/mlc_v3.9a/Linux/mlc) for the control node $control_node:\n\n" >> $file
-		sudo numactl --cpunodebind=$control_node ./src/mlc_v3.9a/Linux/mlc >> $file
+		echo "\n\n\n\nIntel Memory Latency Checker (sudo numactl -m $control_node ./src/mlc_v3.9a/Linux/mlc) for the control node $control_node:\n\n" >> $file
+		sudo numactl -m $control_node ./src/mlc_v3.9a/Linux/mlc >> $file
 		
 		# MLC interest node
-		echo "\n\n\n\nIntel Memory Latency Checker (sudo numactl --cpunodebind=$interest_node ./src/mlc_v3.9a/Linux/mlc) for the interest node $interest_node:\n\n" >> $file
-		sudo numactl --cpunodebind=$interest_node ./src/mlc_v3.9a/Linux/mlc >> $file
+		echo "\n\n\n\nIntel Memory Latency Checker (sudo numactl -m $interest_node ./src/mlc_v3.9a/Linux/mlc) for the interest node $interest_node:\n\n" >> $file
+		sudo numactl -m $interest_node ./src/mlc_v3.9a/Linux/mlc >> $file
 		
 	else
 		echo "Invalid Parameter $workload"
