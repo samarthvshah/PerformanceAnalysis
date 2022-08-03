@@ -756,32 +756,68 @@ while( my $line = <$info>)
 			++$excel_ind_2;
 		} elsif ($file_ind == 34) {
 			
-			# Add in latency chart
-			my $fio_latency_data_chart = $workbook->add_chart( type => 'bar', name => 'Latency Data', embedded => 1 );
-		
-			$fio_latency_data_chart->add_series(
-				categories => '=FIO!$A$6:$A$8',
-				values => '=FIO!$B$6:$B$8',
-				name => 'Min Time',
+			my $fio_lat_data_chart = $workbook->add_chart( type => 'bar', name => 'Latency Data', embedded => 1 );
+			
+			$fio_lat_data_chart->add_series(
+				categories => '=FIO!$B$5:$E$5',
+				values => '=FIO!$B$8:$E$8',
+				name => 'Latency',
 			);
 			
-			$fio_latency_data_chart->add_series(
-				categories => '=FIO!$A$6:$A$8',
-				values => '=FIO!$C$6:$C$8',
-				name => 'Avg Time',
+			$fio_lat_data_chart->set_y_axis( name => 'Value Type');
+			$fio_lat_data_chart->set_x_axis( name => 'Latency (usec)');
+			$fio_lat_data_chart->set_legend( none => 1 );
+			$fio_lat_data_chart->set_title( name => 'Latency Data' );
+			
+			$fio_wk->insert_chart( 'A12', $fio_lat_data_chart);
+			
+			
+			my $fio_clat_data_chart = $workbook->add_chart( type => 'bar', name => 'clat Data', embedded => 1 );
+			
+			$fio_clat_data_chart->add_series(
+				categories => '=FIO!$B$5:$E$5',
+				values => '=FIO!$B$7:$E$7',
+				name => 'Latency',
 			);
 			
-			$fio_latency_data_chart->add_series(
-				categories => '=FIO!$A$6:$A$8',
-				values => '=FIO!$D$6:$D$8',
-				name => 'Max Time',
+			$fio_clat_data_chart->set_y_axis( name => 'Value Type');
+			$fio_clat_data_chart->set_x_axis( name => 'Latency (nsec)');
+			$fio_clat_data_chart->set_legend( none => 1 );
+			$fio_clat_data_chart->set_title( name => 'Clat Data' );
+			
+			$fio_wk->insert_chart( 'A27', $fio_clat_data_chart);
+			
+			
+			my $fio_slat_data_chart = $workbook->add_chart( type => 'bar', name => 'Slat Data', embedded => 1 );
+			
+			$fio_slat_data_chart->add_series(
+				categories => '=FIO!$B$5:$E$5',
+				values => '=FIO!$B$6:$E$6',
+				name => 'Latency',
 			);
 			
-			$fio_latency_data_chart->set_y_axis( name => 'Type of Latency');
-			$fio_latency_data_chart->set_x_axis( name => 'Time');
-			$fio_latency_data_chart->set_title( name => 'Timing Data' );
+			$fio_slat_data_chart->set_y_axis( name => 'Value Type');
+			$fio_slat_data_chart->set_x_axis( name => 'Latency (usec)');
+			$fio_slat_data_chart->set_legend( none => 1 );
+			$fio_slat_data_chart->set_title( name => 'Slat Data' );
 			
-			$fio_wk->insert_chart( 'A12', $fio_latency_data_chart);
+			$fio_wk->insert_chart( 'D12', $fio_slat_data_chart);
+			
+				
+			my $fio_band_data_chart = $workbook->add_chart( type => 'bar', name => 'Bandwidth Data', embedded => 1 );
+			
+			$fio_band_data_chart->add_series(
+				categories => '=FIO!$B$5:$E$5',
+				values => '=FIO!$B$9:$E$9',
+				name => 'Bandwidth',
+			);
+			
+			$fio_band_data_chart->set_y_axis( name => 'Value Type');
+			$fio_band_data_chart->set_x_axis( name => 'Bandwidth (mb/s)');
+			$fio_band_data_chart->set_legend( none => 1 );
+			$fio_band_data_chart->set_title( name => 'Bandwidth Data' );
+			
+			$fio_wk->insert_chart( 'D27', $fio_band_data_chart);
 		}
 	} elsif ($state eq "multichase") {
 		$multichase_wk->set_row( ${excel_ind}-1, 20);
