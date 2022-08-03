@@ -678,16 +678,33 @@ while( my $line = <$info>)
 		$fio_wk->set_row( ${excel_ind}-1, 25);
 		
 		if ($file_ind == 1) {
-			$fio_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 4, $line, $primary_header_format);
-			
-			++$excel_ind;			
+			$fio_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 7, $line, $primary_header_format);
+			++$excel_ind;	
+			++$excel_ind_2;		
 		} elsif ($file_ind == 4) {
-			$fio_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 4, $line, $basic_centered_format);
+			$fio_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 7, $line, $basic_centered_format);
 			++$excel_ind;
+			++$excel_ind_2;	
+		} elsif ($file_ind == 13) {
+			$fio_wk->merge_range( ${excel_ind}-2, 0, ${excel_ind}-2, 5, $line, $basic_centered_format);
+			++$excel_ind;
+			++$excel_ind_2;	
 		} elsif ($file_ind == 5) {
-			$fio_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 4, $line, $secondary_header_format);
+			$fio_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 7, $line, $secondary_header_format);
 			++$excel_ind;
-		} elsif (($file_ind >= 13 && $file_ind < 17) || ($file_ind >= 23 && $file_ind < 29)) {
+			++$excel_ind_2;	
+		} elsif ($file_ind == 6) {
+		
+			$fio_wk->write(${excel_ind}, 0, "Data Type", $secondary_header_format);
+			$fio_wk->write(${excel_ind}, 1, "Min", $secondary_header_format);
+			$fio_wk->write(${excel_ind}, 2, "Avg", $secondary_header_format);
+			$fio_wk->write(${excel_ind}, 3, "Max", $secondary_header_format);
+			$fio_wk->write(${excel_ind}, 4, "Std Dev", $secondary_header_format);
+			$fio_wk->write(${excel_ind}, 5, "Samples", $secondary_header_format);
+			
+			++$excel_ind;
+			++$excel_ind_2;	
+		} elsif (($file_ind >= 14 && $file_ind < 17) || ($file_ind >= 23 && $file_ind < 25)) {
 			my ($key, $val) = split(/:/, $line);
 			$key =~ s/^\s*(.*?)\s*$/$1/;
 			$val =~ s/^\s*(.*?)\s*$/$1/;
@@ -695,12 +712,23 @@ while( my $line = <$info>)
 			$fio_wk->write( "A${excel_ind}", $key);
 			
 			my @splits = split(/,/, $val);
-			$loop_index = 1;
 			
 			foreach(@splits) {
 				$_ =~ s/^\s+//;
-				$fio_wk->write(${excel_ind}-1, ${loop_index}, $_);
-				++$loop_index;
+				
+				my ($key_2, $val_2) = split(/=/, $_);
+				
+				if ($key_2 eq "min") {
+					$fio_wk->write(${excel_ind}-1, 1, $val_2);
+				} elsif ($key_2 eq "avg") {
+					$fio_wk->write(${excel_ind}-1, 2, $val_2);
+				} elsif ($key_2 eq "max") {
+					$fio_wk->write(${excel_ind}-1, 3, $val_2);
+				} elsif ($key_2 eq "stdev") {
+					$fio_wk->write(${excel_ind}-1, 4, $val_2);
+				} elsif ($key_2 eq "samples") {
+					$fio_wk->write(${excel_ind}-1, 5, $val_2);
+				}
 			}
 			
 			$loop_index = 1;
@@ -708,20 +736,52 @@ while( my $line = <$info>)
 			++$excel_ind;
 		} elsif ($file_ind == 17) {
 			$line =~ s/^\s+//;
-			$fio_wk->write(${excel_ind}-1, 0, $line)
+			$fio_wk->write(${excel_ind_2}-1, 7, $line);
+			++$excel_ind_2;
 		} elsif ($file_ind >= 18 && $file_ind < 23) {
 			my @splits = split(/,/, $line);	
+			
+			$loop_index = 7;
 			
 			foreach(@splits) {
 				$_ = substr $_, 1;
 				$_ =~ s/^\s+//;
-				$fio_wk->write(${excel_ind}-1, ${loop_index}, $_);
+				$fio_wk->write(${excel_ind_2}-1, ${loop_index}, $_);
 				++$loop_index;
 			}
 			
 			if ($file_ind == 22) {
-				++$excel_ind;	
+				++$excel_ind_2;	
 			}
+			++$excel_ind_2;
+		} elsif ($file_ind == 34) {
+			
+			# Add in latency chart
+			my $fio_latency_data_chart = $workbook->add_chart( type => 'bar', name => 'Latency Data', embedded => 1 );
+		
+			$fio_latency_data_chart->add_series(
+				categories => '=FIO!$A$6:$A$8',
+				values => '=FIO!$B$6:$B$8',
+				name => 'Min Time',
+			);
+			
+			$fio_latency_data_chart->add_series(
+				categories => '=FIO!$A$6:$A$8',
+				values => '=FIO!$C$6:$C$8',
+				name => 'Avg Time',
+			);
+			
+			$fio_latency_data_chart->add_series(
+				categories => '=FIO!$A$6:$A$8',
+				values => '=FIO!$D$6:$D$8',
+				name => 'Max Time',
+			);
+			
+			$fio_latency_data_chart->set_y_axis( name => 'Type of Latency');
+			$fio_latency_data_chart->set_x_axis( name => 'Time');
+			$fio_latency_data_chart->set_title( name => 'Timing Data' );
+			
+			$fio_wk->insert_chart( 'A12', $fio_latency_data_chart);
 		}
 	} elsif ($state eq "multichase") {
 		$multichase_wk->set_row( ${excel_ind}-1, 20);
