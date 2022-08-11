@@ -202,12 +202,12 @@ while( my $line = <$info>)
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
 		$stress_interest_wk->set_row(6, 30);
-	} elsif ($line eq "STREAM (numactl --cpunodebind=$control_node ./src/Stream/stream) for the control node $control_node:") {
+	} elsif ($line eq "STREAM (numactl -m $control_node ./src/Stream/stream) for the control node $control_node:") {
 		$state = "stream_cont";
 		$file_ind = 1;
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
-	} elsif ($line eq "STREAM (numactl --cpunodebind=$interest_node ./src/Stream/stream) for the interest node $interest_node:") {
+	} elsif ($line eq "STREAM (numactl -m $interest_node ./src/Stream/stream) for the interest node $interest_node:") {
 		$state = "stream_int";
 		$file_ind = 1;
 		$excel_ind = 1;
@@ -264,13 +264,13 @@ while( my $line = <$info>)
 		$file_ind = 1;
 		$excel_ind = 2;
 		$excel_ind_2 = 2;
-	} elsif ($line eq "Intel Memory Latency Checker (sudo numactl --cpunodebind=$control_node ./src/mlc_v3.9a/Linux/mlc) for the control node $control_node:") {
+	} elsif ($line eq "Intel Memory Latency Checker (sudo numactl -m $control_node ./src/mlc_v3.9a/Linux/mlc) for the control node $control_node:") {
 		$state = "mlc_cont";
 		$file_ind = 1;
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
 		$state_2 = "start";
-	} elsif ($line eq "Intel Memory Latency Checker (sudo numactl --cpunodebind=$interest_node ./src/mlc_v3.9a/Linux/mlc) for the interest node $interest_node:") {
+	} elsif ($line eq "Intel Memory Latency Checker (sudo numactl -m $interest_node ./src/mlc_v3.9a/Linux/mlc) for the interest node $interest_node:") {
 		$state = "mlc_int";
 		$file_ind = 1;
 		$excel_ind = 1;

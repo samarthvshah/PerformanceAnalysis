@@ -111,8 +111,8 @@ do
 
 		# Get number of threads for StressAppTest
 		echo ""
-		read -p "How many threads do you want to use for StressAppTest on the control node (default is 31, enter -1 to attempt usage of all the machines threads): " stressthreadvar
-		read -p "How much memory do you want to use for StressAppTest on the control node (default is 40000 -> 40gb the format is the # of megabytes): " stressmemvar
+		read -p "How many threads do you want to use for StressAppTest (default is 31, enter -1 to attempt usage of all the machines threads): " stressthreadvar
+		read -p "How much memory do you want to use for StressAppTest (default is 40000 -> 40gb the format is the # of megabytes): " stressmemvar
 		
 		
 		# StressAppTest for the control node
@@ -187,10 +187,10 @@ do
 		echo "Latency Test:\n" >> $file
 		
 		# Create a csv version of the timing data
-#		fio_csv_creation
 		
 		# Run and output to report file
 		numactl -m $interest_node fio --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=120 --size=128M --numjobs=1 >> $file
+#		fio_csv_creation
 #		fio_generate_plots "Read Test" 800 600
 		
 		# Delete job file
@@ -200,7 +200,7 @@ do
 	
 		# Get number of threads for multichase
 		echo ""
-		read -p "How many threads do you want to use for multichase on the control node (default is 8, enter -1 to attempt usage of all the machines threads): " threadvar
+		read -p "How many threads do you want to use for multichase (default is 8, enter -1 to attempt usage of all the machines threads): " threadvar
 		
 		if [ "$threadvar" = "-1" ]; then
 			threads=`nproc`

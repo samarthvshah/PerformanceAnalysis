@@ -111,8 +111,8 @@ do
 
 		# Get number of threads for StressAppTest
 		echo ""
-		read -p "How many threads do you want to use for StressAppTest on the control node (default is 1, enter -1 to attempt usage of all the machines threads): " stressthreadvar
-		read -p "How much memory do you want to use for StressAppTest on the control node (default is 40000 -> 40gb the format is the # of megabytes): " stressmemvar
+		read -p "How many threads do you want to use for StressAppTest (default is 1, enter -1 to attempt usage of all the machines threads): " stressthreadvar
+		read -p "How much memory do you want to use for StressAppTest (default is 40000 -> 40gb the format is the # of megabytes): " stressmemvar
 		
 		
 		# StressAppTest for the control node
@@ -124,15 +124,15 @@ do
 		
 		if [ "$stressthreadvar" = "-1" ]; then
 			echo "numactl -m $control_node stressapptest -s 1200 -M $stressmemvar -W -v 4" >> $file
-			numactl -m $control_node stressapptest -s 1200 -M $stressmemvar -W -v 4 >> $file
+			numactl -m $control_node stressapptest -s 10 -M $stressmemvar -W -v 4 >> $file
 
 		elif [ "$stressthreadvar" = "" ]; then
 			echo "numactl -m $control_node stressapptest -s 1200 -M $stressmemvar -W -m 1 -v 4" >> $file
-			numactl -m $control_node stressapptest -s 1200 -M $stressmemvar -W -m 1 -v 4  >> $file
+			numactl -m $control_node stressapptest -s 10 -M $stressmemvar -W -m 1 -v 4  >> $file
 
 		else
 			echo "numactl -m $control_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4" >> $file
-			numactl -m $control_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
+			numactl -m $control_node stressapptest -s 10 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
 			
 		fi
 		
@@ -142,15 +142,15 @@ do
 		
 		if [ "$stressthreadvar" = "-1" ]; then
 			echo "numactl -m $interest_node stressapptest -s 1200 -M $stressmemvar -W -v 4" >> $file
-			numactl -m $interest_node stressapptest -s 1200 -M $stressmemvar -W -v 4 >> $file
+			numactl -m $interest_node stressapptest -s 10 -M $stressmemvar -W -v 4 >> $file
 
 		elif [ "$stressthreadvar" = "" ]; then
 			echo "numactl -m $interest_node stressapptest -s 1200 -M $stressmemvar -W -m 1 -v 4" >> $file
-			numactl -m $interest_node stressapptest -s 1200 -M $stressmemvar -W -m 1 -v 4  >> $file
+			numactl -m $interest_node stressapptest -s 10 -M $stressmemvar -W -m 1 -v 4  >> $file
 
 		else
 			echo "numactl -m $interest_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4" >> $file
-			numactl -m $interest_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
+			numactl -m $interest_node stressapptest -s 10 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
 			
 		fi
 		
@@ -200,7 +200,7 @@ do
 	
 		# Get number of threads for multichase
 		echo ""
-		read -p "How many threads do you want to use for multichase on the control node (default is 1, enter -1 to attempt usage of all the machines threads): " threadvar
+		read -p "How many threads do you want to use for multichase (default is 1, enter -1 to attempt usage of all the machines threads): " threadvar
 		
 		if [ "$threadvar" = "-1" ]; then
 			threads=`nproc`
