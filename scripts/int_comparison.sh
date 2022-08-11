@@ -124,15 +124,15 @@ do
 		
 		if [ "$stressthreadvar" = "-1" ]; then
 			echo "numactl -m $control_node stressapptest -s 1200 -M $stressmemvar -W -v 4" >> $file
-			numactl -m $control_node stressapptest -s 10 -M $stressmemvar -W -v 4 >> $file
+			numactl -m $control_node stressapptest -s 1200 -M $stressmemvar -W -v 4 >> $file
 
 		elif [ "$stressthreadvar" = "" ]; then
 			echo "numactl -m $control_node stressapptest -s 1200 -M $stressmemvar -W -m 1 -v 4" >> $file
-			numactl -m $control_node stressapptest -s 10 -M $stressmemvar -W -m 1 -v 4  >> $file
+			numactl -m $control_node stressapptest -s 1200 -M $stressmemvar -W -m 1 -v 4  >> $file
 
 		else
 			echo "numactl -m $control_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4" >> $file
-			numactl -m $control_node stressapptest -s 10 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
+			numactl -m $control_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
 			
 		fi
 		
@@ -142,15 +142,15 @@ do
 		
 		if [ "$stressthreadvar" = "-1" ]; then
 			echo "numactl -m $interest_node stressapptest -s 1200 -M $stressmemvar -W -v 4" >> $file
-			numactl -m $interest_node stressapptest -s 10 -M $stressmemvar -W -v 4 >> $file
+			numactl -m $interest_node stressapptest -s 1200 -M $stressmemvar -W -v 4 >> $file
 
 		elif [ "$stressthreadvar" = "" ]; then
 			echo "numactl -m $interest_node stressapptest -s 1200 -M $stressmemvar -W -m 1 -v 4" >> $file
-			numactl -m $interest_node stressapptest -s 10 -M $stressmemvar -W -m 1 -v 4  >> $file
+			numactl -m $interest_node stressapptest -s 1200 -M $stressmemvar -W -m 1 -v 4  >> $file
 
 		else
 			echo "numactl -m $interest_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4" >> $file
-			numactl -m $interest_node stressapptest -s 10 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
+			numactl -m $interest_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
 			
 		fi
 		
