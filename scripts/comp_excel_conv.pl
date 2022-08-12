@@ -471,7 +471,7 @@ while( my $line = <$info>)
 				++$excel_ind;
 			}
 			
-			if (index($line, "Stats") != -1 || index($line, "Status") != -1) {
+		if (index($line, "Stats") != -1) {
 				$stat_ind = index($line, "Stats");
 				$line = substr($line, $stat_ind);
 				
@@ -484,7 +484,13 @@ while( my $line = <$info>)
 		
 				if (defined $val) {
 					$val =~ s/^\s*(.*?)\s*$/$1/;
+
 					my ($total, $bandw) = split(/ at /, $val);
+										
+					if (defined $bandw) {
+						$total = substr( $total, 0, -1);
+						$bandw = substr( $bandw, 0, -4);
+					}
 					
 					if (defined $total) {
 						$stress_control_wk->write( "B${excel_ind}", $total);
@@ -495,9 +501,44 @@ while( my $line = <$info>)
 					}
 				}
 				++$excel_ind;
-			}		
+			}	
+			
+			if (index($line, "Status") != -1) {
+				$stress_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $basic_centered_format);
+				++$excel_ind;
+				
+				my $stress_cont_band_data_chart = $workbook->add_chart( type => 'bar', name => 'Bandwidth Data', embedded => 1 );
+			
+				$stress_cont_band_data_chart->add_series(
+					categories => '=StressAppTest Control Node!$A$9:$A$14',
+					values => '=StressAppTest Control Node!$C$9:$C$14',
+					name => 'Bandwidth',
+				);
+				
+				$stress_cont_band_data_chart->set_y_axis( name => 'Type of Operation');
+				$stress_cont_band_data_chart->set_x_axis( name => 'Bandwidth (mb/s)');
+				$stress_cont_band_data_chart->set_legend( none => 1 );
+				$stress_cont_band_data_chart->set_title( name => 'Bandwidth Data' );
+				
+				$stress_control_wk->insert_chart( 'A17', $stress_cont_band_data_chart);
+				
+				
+				my $stress_cont_total_data_chart = $workbook->add_chart( type => 'bar', name => 'Total Data', embedded => 1 );
+			
+				$stress_cont_total_data_chart->add_series(
+					categories => '=StressAppTest Control Node!$A$9:$A$14',
+					values => '=StressAppTest Control Node!$B$9:$B$14',
+					name => 'Total Amount',
+				);
+				
+				$stress_cont_total_data_chart->set_y_axis( name => 'Type of Operation');
+				$stress_cont_total_data_chart->set_x_axis( name => 'Total Amount (mb)');
+				$stress_cont_total_data_chart->set_legend( none => 1 );
+				$stress_cont_total_data_chart->set_title( name => 'Total Amount Data' );
+				
+				$stress_control_wk->insert_chart( 'A32', $stress_cont_total_data_chart);
+			}
 		}
-	# Numa maps parsing
 	} elsif ($state eq "stress_int") {
 		$stress_interest_wk->set_row(${excel_ind}-1, 30);
 		
@@ -520,7 +561,7 @@ while( my $line = <$info>)
 				++$excel_ind;
 			}
 			
-			if (index($line, "Stats") != -1 || index($line, "Status") != -1) {
+		if (index($line, "Stats") != -1) {
 				$stat_ind = index($line, "Stats");
 				$line = substr($line, $stat_ind);
 				
@@ -533,7 +574,13 @@ while( my $line = <$info>)
 		
 				if (defined $val) {
 					$val =~ s/^\s*(.*?)\s*$/$1/;
+
 					my ($total, $bandw) = split(/ at /, $val);
+										
+					if (defined $bandw) {
+						$total = substr( $total, 0, -1);
+						$bandw = substr( $bandw, 0, -4);
+					}
 					
 					if (defined $total) {
 						$stress_interest_wk->write( "B${excel_ind}", $total);
@@ -544,7 +591,43 @@ while( my $line = <$info>)
 					}
 				}
 				++$excel_ind;
-			}		
+			}	
+			
+			if (index($line, "Status") != -1) {
+				$stress_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $basic_centered_format);
+				++$excel_ind;
+				
+				my $stress_int_band_data_chart = $workbook->add_chart( type => 'bar', name => 'Bandwidth Data', embedded => 1 );
+			
+				$stress_int_band_data_chart->add_series(
+					categories => '=StressAppTest Control Node!$A$9:$A$14',
+					values => '=StressAppTest Control Node!$C$9:$C$14',
+					name => 'Bandwidth',
+				);
+				
+				$stress_int_band_data_chart->set_y_axis( name => 'Type of Operation');
+				$stress_int_band_data_chart->set_x_axis( name => 'Bandwidth (mb/s)');
+				$stress_int_band_data_chart->set_legend( none => 1 );
+				$stress_int_band_data_chart->set_title( name => 'Bandwidth Data' );
+				
+				$stress_interest_wk->insert_chart( 'A17', $stress_int_band_data_chart);
+				
+				
+				my $stress_int_total_data_chart = $workbook->add_chart( type => 'bar', name => 'Total Data', embedded => 1 );
+			
+				$stress_int_total_data_chart->add_series(
+					categories => '=StressAppTest Control Node!$A$9:$A$14',
+					values => '=StressAppTest Control Node!$B$9:$B$14',
+					name => 'Total Amount',
+				);
+				
+				$stress_int_total_data_chart->set_y_axis( name => 'Type of Operation');
+				$stress_int_total_data_chart->set_x_axis( name => 'Total Amount (mb)');
+				$stress_int_total_data_chart->set_legend( none => 1 );
+				$stress_int_total_data_chart->set_title( name => 'Total Amount Data' );
+				
+				$stress_interest_wk->insert_chart( 'A32', $stress_int_total_data_chart);
+			}
 		}
 	# Numa maps parsing
 	} elsif ($state eq "numamaps") {
@@ -685,6 +768,50 @@ while( my $line = <$info>)
 				++$loop_index;
 			}
 			++$excel_ind;
+		} elsif ($file_ind == 33) {
+		
+			my $stream_cont_band_data_chart = $workbook->add_chart( type => 'bar', name => 'Bandwidth Data', embedded => 1 );
+			
+			$stream_cont_band_data_chart->add_series(
+				categories => '=STREAM Control Node!$A$5:$A$8',
+				values => '=STREAM Control Node!$B$5:$B$8',
+				name => 'Best Rate',
+			);
+			
+			$stream_cont_band_data_chart->set_y_axis( name => 'Type of Operation');
+			$stream_cont_band_data_chart->set_x_axis( name => 'Bandwidth (mb/s)');
+			$stream_cont_band_data_chart->set_legend( none => 1 );
+			$stream_cont_band_data_chart->set_title( name => 'Bandwidth Data' );
+			
+			$stream_control_wk->insert_chart( 'A10', $stream_cont_band_data_chart);
+			
+			
+			
+			my $stream_cont_timing_data_chart = $workbook->add_chart( type => 'bar', name => 'Timing Data', embedded => 1 );
+		
+			$stream_cont_timing_data_chart->add_series(
+				categories => '=STREAM Control Node!$A$5:$A$8',
+				values => '=STREAM Control Node!$D$5:$D$8',
+				name => 'Min Time',
+			);
+			
+			$stream_cont_timing_data_chart->add_series(
+				categories => '=STREAM Control Node!$A$5:$A$8',
+				values => '=STREAM Control Node!$C$5:$C$8',
+				name => 'Avg Time',
+			);
+			
+			$stream_cont_timing_data_chart->add_series(
+				categories => '=STREAM Control Node!$A$5:$A$8',
+				values => '=STREAM Control Node!$E$5:$E$8',
+				name => 'Max Time',
+			);
+			
+			$stream_cont_timing_data_chart->set_y_axis( name => 'Type of Operation');
+			$stream_cont_timing_data_chart->set_x_axis( name => 'Timing (sec)');
+			$stream_cont_timing_data_chart->set_title( name => 'Timing Data' );
+			
+			$stream_control_wk->insert_chart( 'A25', $stream_cont_timing_data_chart);
 		}
 	} elsif ($state eq "stream_int") {
 		$stream_interest_wk->set_row( ${excel_ind}-1, 25);
@@ -711,21 +838,82 @@ while( my $line = <$info>)
 				++$loop_index;
 			}
 			++$excel_ind;
+		} elsif ($file_ind == 33) {
+		
+			my $stream_int_band_data_chart = $workbook->add_chart( type => 'bar', name => 'Bandwidth Data', embedded => 1 );
+			
+			$stream_int_band_data_chart->add_series(
+				categories => '=STREAM Interest Node!$A$5:$A$8',
+				values => '=STREAM Interest Node!$B$5:$B$8',
+				name => 'Best Rate',
+			);
+			
+			$stream_int_band_data_chart->set_y_axis( name => 'Type of Operation');
+			$stream_int_band_data_chart->set_x_axis( name => 'Bandwidth (mb/s)');
+			$stream_int_band_data_chart->set_legend( none => 1 );
+			$stream_int_band_data_chart->set_title( name => 'Bandwidth Data' );
+			
+			$stream_interest_wk->insert_chart( 'A10', $stream_int_band_data_chart);
+			
+			
+			
+			my $stream_int_timing_data_chart = $workbook->add_chart( type => 'bar', name => 'Timing Data', embedded => 1 );
+		
+			$stream_int_timing_data_chart->add_series(
+				categories => '=STREAM Interest Node!$A$5:$A$8',
+				values => '=STREAM Interest Node!$D$5:$D$8',
+				name => 'Min Time',
+			);
+			
+			$stream_int_timing_data_chart->add_series(
+				categories => '=STREAM Interest Node!$A$5:$A$8',
+				values => '=STREAM Interest Node!$C$5:$C$8',
+				name => 'Avg Time',
+			);
+			
+			$stream_int_timing_data_chart->add_series(
+				categories => '=STREAM Interest Node!$A$5:$A$8',
+				values => '=STREAM Interest Node!$E$5:$E$8',
+				name => 'Max Time',
+			);
+			
+			$stream_int_timing_data_chart->set_y_axis( name => 'Type of Operation');
+			$stream_int_timing_data_chart->set_x_axis( name => 'Timing (sec)');
+			$stream_int_timing_data_chart->set_title( name => 'Timing Data' );
+			
+			$stream_interest_wk->insert_chart( 'A25', $stream_int_timing_data_chart);
 		}
 	} elsif ($state eq "fio_cont") {
 		$fio_control_wk->set_row( ${excel_ind}-1, 25);
 		
 		if ($file_ind == 1) {
-			$fio_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 4, $line, $primary_header_format);
-			
-			++$excel_ind;			
+			$fio_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 7, $line, $primary_header_format);
+			++$excel_ind;	
+			++$excel_ind_2;		
 		} elsif ($file_ind == 4) {
-			$fio_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 4, $line, $basic_centered_format);
+			$fio_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 7, $line, $basic_centered_format);
 			++$excel_ind;
+			++$excel_ind_2;	
+		} elsif ($file_ind == 13) {
+			$fio_control_wk->merge_range( ${excel_ind}-2, 0, ${excel_ind}-2, 5, $line, $basic_centered_format);
+			++$excel_ind;
+			++$excel_ind_2;	
 		} elsif ($file_ind == 5) {
-			$fio_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 4, $line, $secondary_header_format);
+			$fio_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 7, $line, $secondary_header_format);
 			++$excel_ind;
-		} elsif (($file_ind >= 13 && $file_ind < 17) || ($file_ind >= 23 && $file_ind < 29)) {
+			++$excel_ind_2;	
+		} elsif ($file_ind == 6) {
+		
+			$fio_control_wk->write(${excel_ind}, 0, "Data Type", $secondary_header_format);
+			$fio_control_wk->write(${excel_ind}, 1, "Min", $secondary_header_format);
+			$fio_control_wk->write(${excel_ind}, 2, "Avg", $secondary_header_format);
+			$fio_control_wk->write(${excel_ind}, 3, "Max", $secondary_header_format);
+			$fio_control_wk->write(${excel_ind}, 4, "Std Dev", $secondary_header_format);
+			$fio_control_wk->write(${excel_ind}, 5, "Samples", $secondary_header_format);
+			
+			++$excel_ind;
+			++$excel_ind_2;	
+		} elsif (($file_ind >= 14 && $file_ind < 17) || ($file_ind >= 23 && $file_ind < 25)) {
 			my ($key, $val) = split(/:/, $line);
 			$key =~ s/^\s*(.*?)\s*$/$1/;
 			$val =~ s/^\s*(.*?)\s*$/$1/;
@@ -733,12 +921,23 @@ while( my $line = <$info>)
 			$fio_control_wk->write( "A${excel_ind}", $key);
 			
 			my @splits = split(/,/, $val);
-			$loop_index = 1;
 			
 			foreach(@splits) {
 				$_ =~ s/^\s+//;
-				$fio_control_wk->write(${excel_ind}-1, ${loop_index}, $_);
-				++$loop_index;
+				
+				my ($key_2, $val_2) = split(/=/, $_);
+				
+				if ($key_2 eq "min") {
+					$fio_control_wk->write(${excel_ind}-1, 1, $val_2);
+				} elsif ($key_2 eq "avg") {
+					$fio_control_wk->write(${excel_ind}-1, 2, $val_2);
+				} elsif ($key_2 eq "max") {
+					$fio_control_wk->write(${excel_ind}-1, 3, $val_2);
+				} elsif ($key_2 eq "stdev") {
+					$fio_control_wk->write(${excel_ind}-1, 4, $val_2);
+				} elsif ($key_2 eq "samples") {
+					$fio_control_wk->write(${excel_ind}-1, 5, $val_2);
+				}
 			}
 			
 			$loop_index = 1;
@@ -746,35 +945,120 @@ while( my $line = <$info>)
 			++$excel_ind;
 		} elsif ($file_ind == 17) {
 			$line =~ s/^\s+//;
-			$fio_control_wk->write(${excel_ind}-1, 0, $line)
-		} elsif ($file_ind >= 17 && $file_ind < 22) {
+			$fio_control_wk->write(${excel_ind_2}-1, 7, $line);
+			++$excel_ind_2;
+		} elsif ($file_ind >= 18 && $file_ind < 23) {
 			my @splits = split(/,/, $line);	
+			
+			$loop_index = 7;
 			
 			foreach(@splits) {
 				$_ = substr $_, 1;
 				$_ =~ s/^\s+//;
-				$fio_control_wk->write(${excel_ind}-1, ${loop_index}, $_);
+				$fio_control_wk->write(${excel_ind_2}-1, ${loop_index}, $_);
 				++$loop_index;
 			}
 			
 			if ($file_ind == 22) {
-				++$excel_ind;	
+				++$excel_ind_2;	
 			}
+			++$excel_ind_2;
+		} elsif ($file_ind == 34) {
+			
+			my $fio_cont_lat_data_chart = $workbook->add_chart( type => 'bar', name => 'Latency Data', embedded => 1 );
+			
+			$fio_cont_lat_data_chart->add_series(
+				categories => '=FIO Control Node!$B$5:$E$5',
+				values => '=FIO Control Node!$B$8:$E$8',
+				name => 'Latency',
+			);
+			
+			$fio_cont_lat_data_chart->set_y_axis( name => 'Value Type');
+			$fio_cont_lat_data_chart->set_x_axis( name => 'Latency (usec)');
+			$fio_cont_lat_data_chart->set_legend( none => 1 );
+			$fio_cont_lat_data_chart->set_title( name => 'Latency Data' );
+			
+			$fio_control_wk->insert_chart( 'A12', $fio_cont_lat_data_chart);
+			
+			
+			my $fio_cont_clat_data_chart = $workbook->add_chart( type => 'bar', name => 'clat Data', embedded => 1 );
+			
+			$fio_cont_clat_data_chart->add_series(
+				categories => '=FIO Control Node!$B$5:$E$5',
+				values => '=FIO Control Node!$B$7:$E$7',
+				name => 'Latency',
+			);
+			
+			$fio_cont_clat_data_chart->set_y_axis( name => 'Value Type');
+			$fio_cont_clat_data_chart->set_x_axis( name => 'Latency (nsec)');
+			$fio_cont_clat_data_chart->set_legend( none => 1 );
+			$fio_cont_clat_data_chart->set_title( name => 'Clat Data' );
+			
+			$fio_control_wk->insert_chart( 'A27', $fio_cont_clat_data_chart);
+			
+			
+			my $fio_cont_slat_data_chart = $workbook->add_chart( type => 'bar', name => 'Slat Data', embedded => 1 );
+			
+			$fio_cont_slat_data_chart->add_series(
+				categories => '=FIO Control Node!$B$5:$E$5',
+				values => '=FIO Control Node!$B$6:$E$6',
+				name => 'Latency',
+			);
+			
+			$fio_cont_slat_data_chart->set_y_axis( name => 'Value Type');
+			$fio_cont_slat_data_chart->set_x_axis( name => 'Latency (usec)');
+			$fio_cont_slat_data_chart->set_legend( none => 1 );
+			$fio_cont_slat_data_chart->set_title( name => 'Slat Data' );
+			
+			$fio_control_wk->insert_chart( 'D12', $fio_cont_slat_data_chart);
+			
+				
+			my $fio_cont_band_data_chart = $workbook->add_chart( type => 'bar', name => 'Bandwidth Data', embedded => 1 );
+			
+			$fio_cont_band_data_chart->add_series(
+				categories => '=FIO Control Node!$B$5:$E$5',
+				values => '=FIO Control Node!$B$9:$E$9',
+				name => 'Bandwidth',
+			);
+			
+			$fio_cont_band_data_chart->set_y_axis( name => 'Value Type');
+			$fio_cont_band_data_chart->set_x_axis( name => 'Bandwidth (mb/s)');
+			$fio_cont_band_data_chart->set_legend( none => 1 );
+			$fio_cont_band_data_chart->set_title( name => 'Bandwidth Data' );
+			
+			$fio_control_wk->insert_chart( 'D27', $fio_cont_band_data_chart);
 		}
 	} elsif ($state eq "fio_int") {
 		$fio_interest_wk->set_row( ${excel_ind}-1, 25);
 		
 		if ($file_ind == 1) {
-			$fio_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 4, $line, $primary_header_format);
-			
-			++$excel_ind;			
+			$fio_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 7, $line, $primary_header_format);
+			++$excel_ind;	
+			++$excel_ind_2;		
 		} elsif ($file_ind == 4) {
-			$fio_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 4, $line, $basic_centered_format);
+			$fio_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 7, $line, $basic_centered_format);
 			++$excel_ind;
+			++$excel_ind_2;	
+		} elsif ($file_ind == 13) {
+			$fio_interest_wk->merge_range( ${excel_ind}-2, 0, ${excel_ind}-2, 5, $line, $basic_centered_format);
+			++$excel_ind;
+			++$excel_ind_2;	
 		} elsif ($file_ind == 5) {
-			$fio_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 4, $line, $secondary_header_format);
+			$fio_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 7, $line, $secondary_header_format);
 			++$excel_ind;
-		} elsif (($file_ind >= 13 && $file_ind < 17) || ($file_ind >= 23 && $file_ind < 29)) {
+			++$excel_ind_2;	
+		} elsif ($file_ind == 6) {
+		
+			$fio_interest_wk->write(${excel_ind}, 0, "Data Type", $secondary_header_format);
+			$fio_interest_wk->write(${excel_ind}, 1, "Min", $secondary_header_format);
+			$fio_interest_wk->write(${excel_ind}, 2, "Avg", $secondary_header_format);
+			$fio_interest_wk->write(${excel_ind}, 3, "Max", $secondary_header_format);
+			$fio_interest_wk->write(${excel_ind}, 4, "Std Dev", $secondary_header_format);
+			$fio_interest_wk->write(${excel_ind}, 5, "Samples", $secondary_header_format);
+			
+			++$excel_ind;
+			++$excel_ind_2;	
+		} elsif (($file_ind >= 14 && $file_ind < 17) || ($file_ind >= 23 && $file_ind < 25)) {
 			my ($key, $val) = split(/:/, $line);
 			$key =~ s/^\s*(.*?)\s*$/$1/;
 			$val =~ s/^\s*(.*?)\s*$/$1/;
@@ -782,12 +1066,23 @@ while( my $line = <$info>)
 			$fio_interest_wk->write( "A${excel_ind}", $key);
 			
 			my @splits = split(/,/, $val);
-			$loop_index = 1;
 			
 			foreach(@splits) {
 				$_ =~ s/^\s+//;
-				$fio_interest_wk->write(${excel_ind}-1, ${loop_index}, $_);
-				++$loop_index;
+				
+				my ($key_2, $val_2) = split(/=/, $_);
+				
+				if ($key_2 eq "min") {
+					$fio_interest_wk->write(${excel_ind}-1, 1, $val_2);
+				} elsif ($key_2 eq "avg") {
+					$fio_interest_wk->write(${excel_ind}-1, 2, $val_2);
+				} elsif ($key_2 eq "max") {
+					$fio_interest_wk->write(${excel_ind}-1, 3, $val_2);
+				} elsif ($key_2 eq "stdev") {
+					$fio_interest_wk->write(${excel_ind}-1, 4, $val_2);
+				} elsif ($key_2 eq "samples") {
+					$fio_interest_wk->write(${excel_ind}-1, 5, $val_2);
+				}
 			}
 			
 			$loop_index = 1;
@@ -795,20 +1090,88 @@ while( my $line = <$info>)
 			++$excel_ind;
 		} elsif ($file_ind == 17) {
 			$line =~ s/^\s+//;
-			$fio_interest_wk->write(${excel_ind}-1, 0, $line)
+			$fio_interest_wk->write(${excel_ind_2}-1, 7, $line);
+			++$excel_ind_2;
 		} elsif ($file_ind >= 18 && $file_ind < 23) {
 			my @splits = split(/,/, $line);	
+			
+			$loop_index = 7;
 			
 			foreach(@splits) {
 				$_ = substr $_, 1;
 				$_ =~ s/^\s+//;
-				$fio_interest_wk->write(${excel_ind}-1, ${loop_index}, $_);
+				$fio_interest_wk->write(${excel_ind_2}-1, ${loop_index}, $_);
 				++$loop_index;
 			}
 			
 			if ($file_ind == 22) {
-				++$excel_ind;	
+				++$excel_ind_2;	
 			}
+			++$excel_ind_2;
+		} elsif ($file_ind == 34) {
+			
+			my $fio_int_lat_data_chart = $workbook->add_chart( type => 'bar', name => 'Latency Data', embedded => 1 );
+			
+			$fio_int_lat_data_chart->add_series(
+				categories => '=FIO Interest Node!$B$5:$E$5',
+				values => '=FIO Interest Node!$B$8:$E$8',
+				name => 'Latency',
+			);
+			
+			$fio_int_lat_data_chart->set_y_axis( name => 'Value Type');
+			$fio_int_lat_data_chart->set_x_axis( name => 'Latency (usec)');
+			$fio_int_lat_data_chart->set_legend( none => 1 );
+			$fio_int_lat_data_chart->set_title( name => 'Latency Data' );
+			
+			$fio_interest_wk->insert_chart( 'A12', $fio_int_lat_data_chart);
+			
+			
+			my $fio_int_clat_data_chart = $workbook->add_chart( type => 'bar', name => 'clat Data', embedded => 1 );
+			
+			$fio_int_clat_data_chart->add_series(
+				categories => '=FIO Interest Node!$B$5:$E$5',
+				values => '=FIO Interest Node!$B$7:$E$7',
+				name => 'Latency',
+			);
+			
+			$fio_int_clat_data_chart->set_y_axis( name => 'Value Type');
+			$fio_int_clat_data_chart->set_x_axis( name => 'Latency (nsec)');
+			$fio_int_clat_data_chart->set_legend( none => 1 );
+			$fio_int_clat_data_chart->set_title( name => 'Clat Data' );
+			
+			$fio_interest_wk->insert_chart( 'A27', $fio_int_clat_data_chart);
+			
+			
+			my $fio_int_slat_data_chart = $workbook->add_chart( type => 'bar', name => 'Slat Data', embedded => 1 );
+			
+			$fio_int_slat_data_chart->add_series(
+				categories => '=FIO Interest Node!$B$5:$E$5',
+				values => '=FIO Interest Node!$B$6:$E$6',
+				name => 'Latency',
+			);
+			
+			$fio_int_slat_data_chart->set_y_axis( name => 'Value Type');
+			$fio_int_slat_data_chart->set_x_axis( name => 'Latency (usec)');
+			$fio_int_slat_data_chart->set_legend( none => 1 );
+			$fio_int_slat_data_chart->set_title( name => 'Slat Data' );
+			
+			$fio_interest_wk->insert_chart( 'D12', $fio_int_slat_data_chart);
+			
+				
+			my $fio_int_band_data_chart = $workbook->add_chart( type => 'bar', name => 'Bandwidth Data', embedded => 1 );
+			
+			$fio_int_band_data_chart->add_series(
+				categories => '=FIO Interest Node!$B$5:$E$5',
+				values => '=FIO Interest Node!$B$9:$E$9',
+				name => 'Bandwidth',
+			);
+			
+			$fio_int_band_data_chart->set_y_axis( name => 'Value Type');
+			$fio_int_band_data_chart->set_x_axis( name => 'Bandwidth (mb/s)');
+			$fio_int_band_data_chart->set_legend( none => 1 );
+			$fio_int_band_data_chart->set_title( name => 'Bandwidth Data' );
+			
+			$fio_interest_wk->insert_chart( 'D27', $fio_int_band_data_chart);
 		}
 	} elsif ($state eq "multichase_cont") {
 		$multichase_control_wk->set_row( ${excel_ind}-1, 20);
@@ -1245,6 +1608,21 @@ while( my $line = <$info>)
 				$mlc_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $secondary_header_format);
 				++$excel_ind;
 				++$excel_ind_2;
+				
+				my $mlc_cont_bwlat_curve_chart = $workbook->add_chart( type => 'line', name => 'Bandwidth Latency Curve Data', embedded => 1 );
+				
+				$mlc_cont_bwlat_curve_chart->add_series(
+					categories => '=MLC Control Node!$B$30:$B$48',
+					values => '=MLC Control Node!$C$30:$C$48',
+					name => 'Bandwidth Latency Curve',
+				);
+				
+				$mlc_cont_bwlat_curve_chart->set_x_axis( name => 'Latency (ns)');
+				$mlc_cont_bwlat_curve_chart->set_y_axis( name => 'Bandwidth (mb/s)');
+				$mlc_cont_bwlat_curve_chart->set_legend( none => 1 );
+				$mlc_cont_bwlat_curve_chart->set_title( name => 'Bandwidth Latency Curve' );
+			
+				$mlc_control_wk->insert_chart( 'D27', $mlc_cont_bwlat_curve_chart);
 			} elsif ($excel_ind_2 < 3) {
 				$mlc_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $basic_centered_format);
 				++$excel_ind;
@@ -1418,6 +1796,21 @@ while( my $line = <$info>)
 				$mlc_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $secondary_header_format);
 				++$excel_ind;
 				++$excel_ind_2;
+				
+				my $mlc_int_bwlat_curve_chart = $workbook->add_chart( type => 'line', name => 'Bandwidth Latency Curve Data', embedded => 1 );
+				
+				$mlc_int_bwlat_curve_chart->add_series(
+					categories => '=MLC Interest Node!$B$30:$B$48',
+					values => '=MLC Interest Node!$C$30:$C$48',
+					name => 'Bandwidth Latency Curve',
+				);
+				
+				$mlc_int_bwlat_curve_chart->set_x_axis( name => 'Latency (ns)');
+				$mlc_int_bwlat_curve_chart->set_y_axis( name => 'Bandwidth (mb/s)');
+				$mlc_int_bwlat_curve_chart->set_legend( none => 1 );
+				$mlc_int_bwlat_curve_chart->set_title( name => 'Bandwidth Latency Curve' );
+			
+				$mlc_interest_wk->insert_chart( 'D27', $mlc_int_bwlat_curve_chart);
 			} elsif ($excel_ind_2 < 3) {
 				$mlc_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $basic_centered_format);
 				++$excel_ind;

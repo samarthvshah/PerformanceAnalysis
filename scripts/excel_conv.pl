@@ -1102,6 +1102,22 @@ while( my $line = <$info>)
 				$mlc_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $secondary_header_format);
 				++$excel_ind;
 				++$excel_ind_2;
+				
+				
+				my $mlc_bwlat_curve_chart = $workbook->add_chart( type => 'line', name => 'Bandwidth Latency Curve Data', embedded => 1 );
+				
+				$mlc_bwlat_curve_chart->add_series(
+					categories => '=MLC!$B$30:$B$48',
+					values => '=MLC!$C$30:$C$48',
+					name => 'Bandwidth Latency Curve',
+				);
+				
+				$mlc_bwlat_curve_chart->set_x_axis( name => 'Latency (ns)');
+				$mlc_bwlat_curve_chart->set_y_axis( name => 'Bandwidth (mb/s)');
+				$mlc_bwlat_curve_chart->set_legend( none => 1 );
+				$mlc_bwlat_curve_chart->set_title( name => 'Bandwidth Latency Curve' );
+			
+				$mlc_wk->insert_chart( 'D27', $mlc_bwlat_curve_chart);
 			} elsif ($excel_ind_2 < 3) {
 				$mlc_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $basic_centered_format);
 				++$excel_ind;
