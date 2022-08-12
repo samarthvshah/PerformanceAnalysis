@@ -132,7 +132,7 @@ do
 
 		else
 			echo "numactl -m $control_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4" >> $file
-			numactl -m $control_node stressapptest -s 10 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
+			numactl -m $control_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
 			
 		fi
 		
@@ -150,7 +150,7 @@ do
 
 		else
 			echo "numactl -m $interest_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4" >> $file
-			numactl -m $interest_node stressapptest -s 10 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
+			numactl -m $interest_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
 			
 		fi
 		
