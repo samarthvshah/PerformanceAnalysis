@@ -11,7 +11,8 @@ fi
 
 # Script Start Date and Time (for use in file name)
 date=`date +"%m-%d-%y_%H-%M-%S"`
-file=Results/comparison_report_${date}.txt
+mkdir Results/perf_amd_comparison_report_${date}/
+file=Results/perf_amd_comparison_report_${date}/perf_amd_comparison_report_${date}.txt
 
 # Showing system Numa information
 echo ""
@@ -252,7 +253,7 @@ done
 IFS=$OIFS
 
 # Call the perl script to convert the txt report file to an excel file that is easier to read
-perl scripts/comp_excel_conv.pl "$file" "$workloads" "$date" "$control_node" "$interest_node"
+perl scripts/comp_excel_conv.pl "$file" "$workloads" "$date" "$control_node" "$interest_node" "amd"
 
 # Deleting the temp files needed for the excel files after they are inserted
 rm sys_topo_${date}.png

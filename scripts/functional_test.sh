@@ -18,7 +18,8 @@ fi
 
 # Script Start Date and Time (for use in file name)
 date=`date +"%m-%d-%y_%H-%M-%S"`
-file=Results/functional_report_${date}.txt
+mkdir Results/perf_$1_functional_report_${date}/
+file=Results/perf_$1_functional_report_${date}/perf_$1_functional_report_${date}.txt
 
 # System Information
 echo "CPU INFO:\n\n" > $file
@@ -77,11 +78,13 @@ lstopo sys_topo_${date}.png
 
 # Ask how long the user wants to stress the machine (short and long)
 echo ""
-read -p "How long do you want to run StressAppTest for a short amount of time (default is 20, with the input as the # of seconds): " short_time
-read -p "How long do you want to run StressAppTest for a long amount of time (default is 1200, with the input as the # of seconds): " long_time
+read -p "How long do you want to run StressAppTest for a short amount of time (default is 2, with the input as the # of minutes): " short_time
+short_time=$((short_time * 60))
+read -p "How long do you want to run StressAppTest for a long amount of time (default is 20, with the input as the # of minutes): " long_time
+long_time=$((long_time * 60))
 
 if [ "$short_time" = "" ]; then
-	short_time="20"
+	short_time="120"
 fi
 
 if [ "$long_time" = "" ]; then
@@ -134,7 +137,7 @@ fi
 
 		
 # Call the perl script to convert the txt report file to an excel file that is easier to read
-perl scripts/func_conv.pl "$file" "$date"
+perl scripts/func_conv.pl "$file" "$date" "$1"
 
 # Deleting the temp files needed for the excel files after they are inserted
 rm sys_topo_${date}.png

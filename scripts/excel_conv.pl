@@ -5,8 +5,8 @@ use warnings;
 use Excel::Writer::XLSX;
 
 # Getting the parameters passed in by the workload running script
-my ($reportfile, $workloadsstr, $date, $type) = @ARGV;
-my $filename = "Results/${type}_report_${date}.xlsx";
+my ($reportfile, $workloadsstr, $date, $type, $platform) = @ARGV;
+my $filename = "Results/perf_${platform}_${type}_report_${date}/perf_${platform}_${type}_report_${date}.xlsx";
 my @workloads = split(/,/, $workloadsstr);
 my @states = ("cpuinfo", "meminfo", "osinfo", "biosinfo", "bmcinfo", "numastat", "numactl", "numamaps", "lstopo", @workloads);
 

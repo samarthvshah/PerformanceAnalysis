@@ -29,7 +29,8 @@ fi
 
 # Script Start Date and Time (for use in file name)
 date=`date +"%m-%d-%y_%H-%M-%S"`
-file=Results/performance_report_${date}.txt
+mkdir Results/perf_amd_performance_report_${date}/
+file=Results/perf_amd_performance_report_${date}/perf_amd_performance_report_${date}.txt
 
 # System Information
 echo "CPU INFO:\n\n" > $file
@@ -199,7 +200,7 @@ do
 done
 
 # Call the perl script to convert the txt report file to an excel file that is easier to read
-perl scripts/excel_conv.pl "$file" "$workloads" "$date" "performance"
+perl scripts/excel_conv.pl "$file" "$workloads" "$date" "performance" "amd"
 
 # Deleting the temp files needed for the excel files after they are inserted
 rm sys_topo_${date}.png
