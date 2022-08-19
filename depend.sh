@@ -105,6 +105,7 @@ fi
 checkfor "lshw"
 checkfor "dmidecode"
 checkfor "wget"
+checkfor "tar"
 
 # Numastat and Numactl come together in a package called numactl
 checkfor "numactl"
