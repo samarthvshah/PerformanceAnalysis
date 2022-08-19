@@ -36,6 +36,10 @@ lscpu >> $file
 echo "\n\n\n\nMEMORY INFO (sudo lshw -C memory):" >> $file
 sudo lshw -C memory >> $file
 
+# PCI Info
+echo "\n\n\n\nPCI INFO (sudo lspci):" >> $file
+sudo lspci >> $file
+
 # OS Info
 echo "\n\n\n\nOS INFO (cat /etc/lsb-release, uname -r):" >> $file
 uname -a >> $file

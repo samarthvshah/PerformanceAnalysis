@@ -8,7 +8,7 @@ use Excel::Writer::XLSX;
 my ($reportfile, $workloadsstr, $date, $control_node, $interest_node, $platform) = @ARGV;
 my $filename = "Results/perf_${platform}_comparison_report_${date}/perf_${platform}_comparison_report_${date}.xlsx";
 my @workloads = split(/,/, $workloadsstr);
-my @states = ("cpuinfo", "meminfo", "osinfo", "biosinfo", "bmcinfo", "numastat", "numactl", "numamaps", "lstopo", @workloads);
+my @states = ("cpuinfo", "meminfo", "pciinfo", "osinfo", "biosinfo", "bmcinfo", "numastat", "numactl", "numamaps", "lstopo", @workloads);
 
 # Creating a new xlsx file
 my $workbook = Excel::Writer::XLSX->new( $filename );
@@ -16,6 +16,7 @@ my $workbook = Excel::Writer::XLSX->new( $filename );
 # Instantiating new worksheets for each of the workloads
 my $cpu_info_wk;
 my $mem_info_wk;
+my $pci_info_wk;
 my $stress_control_wk;
 my $stress_interest_wk;
 my $stream_control_wk;
@@ -78,6 +79,11 @@ foreach (@states) {
 		$os_info_wk = $workbook->add_worksheet("OS Info");
 		$os_info_wk->set_row(0, 30);	
 		$os_info_wk->set_column('A:B',25, $basic_format);
+	# Create a new worksheet for PCI Information, setup formatting	
+	} elsif ($_ eq "pciinfo") {
+		$pci_info_wk = $workbook->add_worksheet("PCI Info");
+		$pci_info_wk->set_row(0, 30);	
+		$pci_info_wk->set_column('A:E',25, $basic_format);
 	# Create a new worksheet for Numastat, setup formatting	
 	} elsif ($_ eq "biosinfo") {
 		$bios_info_wk = $workbook->add_worksheet("BIOS Info");
@@ -182,6 +188,11 @@ while( my $line = <$info>)
 		$excel_ind_2 = 1;
 	} elsif ($line eq "MEMORY INFO (sudo lshw -C memory):") {
 		$state = "meminfo";
+		$file_ind = 1;
+		$excel_ind = 1;
+		$excel_ind_2 = 1;
+	} elsif ($line eq "PCI INFO (sudo lspci):") {
+		$state = "pciinfo";
 		$file_ind = 1;
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
@@ -375,6 +386,18 @@ while( my $line = <$info>)
 			}
 			++$excel_ind;
 		}
+	# PCI information
+	} elsif ($state eq "pciinfo") {
+	
+		$pci_info_wk->set_row(${excel_ind}-1, 30);
+		
+		if ($file_ind == 1) {
+			$pci_info_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 4, $line, $primary_header_format);
+		} else {
+			$pci_info_wk->write( "A${excel_ind}", $line);
+		}
+		++$excel_ind;
+		
 	# Operating System information
 	} elsif ($state eq "osinfo") {
 		$os_info_wk->set_row(${excel_ind}-1, 30);
