@@ -2,6 +2,8 @@
 
 # Ask which of the scripts the user would like to run
 echo ""
+echo "PLEASE MAKE SURE THAT depend.sh HAS BEEN RUN BEFORE USING THIS SCRIPT"
+echo ""
 echo "1. Gather System Information"
 echo "2. Run Functional Testing"
 echo "3. Gather Performance Data"
