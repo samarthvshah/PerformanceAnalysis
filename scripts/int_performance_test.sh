@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Script Start Date and Time (for use in file name)
+date=`date +"%m-%d-%y_%H-%M-%S"`
+
 # Function for creating the csv files
 fio_csv_creation() {
 		# Run and output to json+ for chart conversion later on
@@ -23,12 +26,11 @@ fi
 
 # Starting sensor data collection
 if [ "$sensors" = "yes" ]; then
-	sh scripts/sensor_data.sh &
+	sh scripts/sensor_data.sh Results/perf_intel_performance_report_${date}/sensor_data.txt &
 	sensor_process=$!
 fi
 
-# Script Start Date and Time (for use in file name)
-date=`date +"%m-%d-%y_%H-%M-%S"`
+
 mkdir Results/perf_intel_performance_report_${date}/
 file=Results/perf_intel_performance_report_${date}/perf_intel_performance_report_${date}.txt
 

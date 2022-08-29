@@ -12,6 +12,9 @@ fio_csv_creation() {
 		rm readlatency-test-job.0.0
 }
 
+# Script Start Date and Time (for use in file name)
+date=`date +"%m-%d-%y_%H-%M-%S"`
+
 # Ask if the user wants to collect sensor data
 echo ""
 read -p "Do you want to collect sensor data? (yes or no, default is yes): " sensors
@@ -23,12 +26,10 @@ fi
 
 # Starting sensor data collection
 if [ "$sensors" = "yes" ]; then
-	sh scripts/sensor_data.sh &
+	sh scripts/sensor_data.sh Results/perf_amd_performance_report_${date}/sensor_data.txt &
 	sensor_process=$!
 fi
 
-# Script Start Date and Time (for use in file name)
-date=`date +"%m-%d-%y_%H-%M-%S"`
 mkdir Results/perf_amd_performance_report_${date}/
 file=Results/perf_amd_performance_report_${date}/perf_amd_performance_report_${date}.txt
 

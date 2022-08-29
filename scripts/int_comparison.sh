@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Script Start Date and Time (for use in file name)
+date=`date +"%m-%d-%y_%H-%M-%S"`
+
 # Ask if the user wants to collect sensor data
 echo ""
 read -p "Do you want to collect sensor data? (yes or no, default is yes): " sensors
@@ -9,8 +12,6 @@ if [ "$sensors" = "" ]; then
 	sensors="yes"
 fi
 
-# Script Start Date and Time (for use in file name)
-date=`date +"%m-%d-%y_%H-%M-%S"`
 mkdir Results/perf_intel_comparison_report_${date}/
 file=Results/perf_intel_comparison_report_${date}/perf_intel_comparison_report_${date}.txt
 
@@ -47,7 +48,7 @@ fi
 
 # Starting sensor data collection
 if [ "$sensors" = "yes" ]; then
-	sh scripts/sensor_data.sh &
+	sh scripts/sensor_data.sh Results/perf_intel_comparison_report_${date}/sensor_data.txt &
 	sensor_process=$!
 fi
 
