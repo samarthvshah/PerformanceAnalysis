@@ -203,6 +203,10 @@ sudo cpanm Excel::Writer::XLSX
 echo "Removing old lmbench and installing the newest version"
 echo "Removing old lmbench and installing the newest version\n" >> log/dependency_log_file_$date.txt 
 
+echo "Installing libtirpc-dev if not already there"
+echo "Installing libtirpc-dev if not already there\n" >> log/dependency_log_file_$date.txt 
+sudo apt-get install libtirpc-dev
+
 if [ -d "src/lmbench/" ]; then
 	rm -rf "src/lmbench/"
 fi
