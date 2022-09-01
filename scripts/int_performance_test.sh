@@ -137,7 +137,8 @@ do
 	elif [ "$workload" = "stream" ]; then
 	
 		# STREAM
-		echo "\n\n\n\nSTREAM (./src/Stream/stream):\n" >> $file
+		echo "\n\n\n\nSTREAM:\n" >> $file
+		echo "./src/Stream/stream" >> $file
 		sudo ./src/Stream/stream >> $file
 		
 	elif [ "$workload" = "fio" ]; then

@@ -163,11 +163,13 @@ do
 	elif [ "$workload" = "stream" ]; then
 	
 		# STREAM on the control node
-		echo "\n\n\n\nSTREAM (numactl -m $control_node ./src/Stream/stream) for the control node $control_node:\n" >> $file
+		echo "\n\n\n\nSTREAM for the control node $control_node:\n" >> $file
+		echo "numactl -m $control_node ./src/Stream/stream" >> $file
 		numactl -m $control_node ./src/Stream/stream >> $file
 		
 		# STREAM interest node
-		echo "\n\n\n\nSTREAM (numactl -m $interest_node ./src/Stream/stream) for the interest node $interest_node:\n" >> $file
+		echo "\n\n\n\nSTREAM for the interest node $interest_node:\n" >> $file
+		echo "numactl -m $interest_node ./src/Stream/stream" >> $file
 		numactl -m $interest_node ./src/Stream/stream >> $file
 		
 	elif [ "$workload" = "fio" ]; then
@@ -253,11 +255,13 @@ do
 	elif [ "$workload" = "mlc" ]; then
 	
 		# MLC control node
-		echo "\n\n\n\nIntel Memory Latency Checker (sudo numactl -m $control_node ./src/mlc_v3.9a/Linux/mlc) for the control node $control_node:\n\n" >> $file
+		echo "\n\n\n\nIntel Memory Latency Checker for the control node $control_node:\n\n" >> $file
+		echo "sudo numactl -m $control_node ./src/mlc_v3.9a/Linux/mlc" >> $file
 		sudo numactl -m $control_node ./src/mlc_v3.9a/Linux/mlc >> $file
 		
 		# MLC interest node
-		echo "\n\n\n\nIntel Memory Latency Checker (sudo numactl -m $interest_node ./src/mlc_v3.9a/Linux/mlc) for the interest node $interest_node:\n\n" >> $file
+		echo "\n\n\n\nIntel Memory Latency Checker for the interest node $interest_node:\n\n" >> $file
+		echo "sudo numactl -m $interest_node ./src/mlc_v3.9a/Linux/mlc" >> $file
 		sudo numactl -m $interest_node ./src/mlc_v3.9a/Linux/mlc >> $file
 		
 	else

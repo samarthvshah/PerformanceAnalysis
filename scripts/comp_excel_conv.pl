@@ -213,12 +213,12 @@ while( my $line = <$info>)
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
 		$stress_interest_wk->set_row(6, 30);
-	} elsif ($line eq "STREAM (numactl -m $control_node ./src/Stream/stream) for the control node $control_node:") {
+	} elsif ($line eq "STREAM for the control node $control_node:") {
 		$state = "stream_cont";
 		$file_ind = 1;
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
-	} elsif ($line eq "STREAM (numactl -m $interest_node ./src/Stream/stream) for the interest node $interest_node:") {
+	} elsif ($line eq "STREAM for the interest node $interest_node:") {
 		$state = "stream_int";
 		$file_ind = 1;
 		$excel_ind = 1;
@@ -275,13 +275,13 @@ while( my $line = <$info>)
 		$file_ind = 1;
 		$excel_ind = 2;
 		$excel_ind_2 = 2;
-	} elsif ($line eq "Intel Memory Latency Checker (sudo numactl -m $control_node ./src/mlc_v3.9a/Linux/mlc) for the control node $control_node:") {
+	} elsif ($line eq "Intel Memory Latency Checker for the control node $control_node:") {
 		$state = "mlc_cont";
 		$file_ind = 1;
 		$excel_ind = 1;
 		$excel_ind_2 = 1;
 		$state_2 = "start";
-	} elsif ($line eq "Intel Memory Latency Checker (sudo numactl -m $interest_node ./src/mlc_v3.9a/Linux/mlc) for the interest node $interest_node:") {
+	} elsif ($line eq "Intel Memory Latency Checker for the interest node $interest_node:") {
 		$state = "mlc_int";
 		$file_ind = 1;
 		$excel_ind = 1;
@@ -309,9 +309,9 @@ while( my $line = <$info>)
 		} elsif ($file_ind >= 6) {
 		
 			# Setting cpu command state
-			if ($line eq "cat:") {
+			if ($line eq "cat (cat/proc/cpuinfo):") {
 				$state_2 = "cat";
-			} elsif ($line eq "lscpu:") {
+			} elsif ($line eq "lscpu (lscpu):") {
 				$state_2 = "ls";
 				$excel_ind_2 = 2;
 			}
@@ -772,17 +772,20 @@ while( my $line = <$info>)
 		if ($file_ind == 1) {
 			$stream_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 4, $line, $primary_header_format);
 			++$excel_ind;
-		} elsif ($file_ind == 15 || $file_ind == 16) {
+		} elsif ($file_ind == 3) {
 			$stream_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 4, $line, $basic_centered_format);
 			++$excel_ind;
-		} elsif ($file_ind >= 28 && $file_ind < 33) {
+		} elsif ($file_ind == 16 || $file_ind == 17) {
+			$stream_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 4, $line, $basic_centered_format);
+			++$excel_ind;
+		} elsif ($file_ind >= 29 && $file_ind < 34) {
 			$line =~ s/^\s+//;
 			my @splits = split(/\s\s+/, $line);
 
 			$loop_index = 0;
 			
 			foreach(@splits) {
-				if ($file_ind == 28) {
+				if ($file_ind == 29) {
 					$stream_control_wk->write( ${excel_ind}-1, ${loop_index}, $_, $secondary_header_format);
 				} else {
 					$stream_control_wk->write( ${excel_ind}-1, ${loop_index}, $_);
@@ -791,7 +794,7 @@ while( my $line = <$info>)
 				++$loop_index;
 			}
 			++$excel_ind;
-		} elsif ($file_ind == 33) {
+		} elsif ($file_ind == 34) {
 		
 			my $stream_cont_band_data_chart = $workbook->add_chart( type => 'bar', name => 'Bandwidth Data', embedded => 1 );
 			
@@ -842,17 +845,20 @@ while( my $line = <$info>)
 		if ($file_ind == 1) {
 			$stream_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 4, $line, $primary_header_format);
 			++$excel_ind;
-		} elsif ($file_ind == 15 || $file_ind == 16) {
+		} elsif ($file_ind == 3) {
 			$stream_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 4, $line, $basic_centered_format);
 			++$excel_ind;
-		} elsif ($file_ind >= 28 && $file_ind < 33) {
+		} elsif ($file_ind == 16 || $file_ind == 17) {
+			$stream_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 4, $line, $basic_centered_format);
+			++$excel_ind;
+		} elsif ($file_ind >= 29 && $file_ind < 34) {
 			$line =~ s/^\s+//;
 			my @splits = split(/\s\s+/, $line);
 
 			$loop_index = 0;
 			
 			foreach(@splits) {
-				if ($file_ind == 28) {
+				if ($file_ind == 29) {
 					$stream_interest_wk->write( ${excel_ind}-1, ${loop_index}, $_, $secondary_header_format);
 				} else {
 					$stream_interest_wk->write( ${excel_ind}-1, ${loop_index}, $_);
@@ -861,7 +867,7 @@ while( my $line = <$info>)
 				++$loop_index;
 			}
 			++$excel_ind;
-		} elsif ($file_ind == 33) {
+		} elsif ($file_ind == 34) {
 		
 			my $stream_int_band_data_chart = $workbook->add_chart( type => 'bar', name => 'Bandwidth Data', embedded => 1 );
 			
@@ -1506,6 +1512,9 @@ while( my $line = <$info>)
 		if ($file_ind == 1) {
 			$mlc_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $primary_header_format);
 			++$excel_ind;
+		} elsif ($file_ind == 4) {
+			$mlc_control_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $basic_centered_format);
+			++$excel_ind;
 		}
 		
 		
@@ -1694,6 +1703,9 @@ while( my $line = <$info>)
 		if ($file_ind == 1) {
 			$mlc_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $primary_header_format);
 			++$excel_ind;
+		} elsif ($file_ind == 4) {
+			$mlc_interest_wk->merge_range( ${excel_ind}-1, 0, ${excel_ind}-1, 2, $line, $basic_centered_format);
+			++$excel_ind;
 		}
 		
 		
@@ -1760,7 +1772,7 @@ while( my $line = <$info>)
 				++$excel_ind;
 				++$excel_ind_2;
 			} else {
-				my ($key, $val) = split(/:/, $line);
+				my ($key, $val) = split(/:\s/, $line);
 				
 				if (defined $key) {
 					$key =~ s/^\s*(.*?)\s*$/$1/;
