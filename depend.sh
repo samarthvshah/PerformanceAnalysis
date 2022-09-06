@@ -173,7 +173,14 @@ fi
 
 # Recompiling stream with the gcc compiler on the system (precompiled does not work)
 echo "compiling stream"
-gcc -fopenmp -D_OPENMP src/Stream/stream.c -o src/Stream/stream >> log/dependency_log_file_$date.txt
+
+read -p "How many elements should the array size be for STREAM? (at least 4x the sum of all the last level caches, default is 1000000): " array_size
+
+if [ "$array_size" = "" ]; then
+	array_size=1000000
+fi
+
+gcc -fopenmp -D_OPENMP -DSTREAM_ARRAY_SIZE=$array_size src/Stream/stream.c -o src/Stream/stream >> log/dependency_log_file_$date.txt
 
 
 # Checking for multichase files
