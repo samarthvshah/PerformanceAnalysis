@@ -114,24 +114,30 @@ do
 		echo ""
 		read -p "How many threads do you want to use for StressAppTest (default is 31, enter -1 to use all the machines threads): " stressthreadvar
 		read -p "How much memory do you want to use for StressAppTest (default is 40000 -> 40gb the format is the # of megabytes): " stressmemvar
+		read -p "How long do you want to run StressAppTest (default is 20, with the input as the # of minutes): " time_to_run
+		time_to_run=$((time_to_run * 60))
+
+		if [ "$time_to_run" = "" ]; then
+			time_to_run="1200"
+		fi
 
 		if [ "$stressmemvar" = "" ]; then
 			stressmemvar="40000"
 		fi
 
 		if [ "$stressthreadvar" = "-1" ]; then
-			echo "stressapptest -s 1200 -M $stressmemvar -W -v 4" >> $file
-			stressapptest -s 1200 -M $stressmemvar -W -v 4 >> $file
+			echo "stressapptest -s $time_to_run -M $stressmemvar -W -v 4" >> $file
+			stressapptest -s $time_to_run -M $stressmemvar -W -v 4 >> $file
 
 		elif [ "$stressthreadvar" = "" ]; then
-			echo "stressapptest -s 1200 -M $stressmemvar -W -m 31 -v 4" >> $file
-			stressapptest -s 1200 -M $stressmemvar -W -m 31 -v 4 >> $file
+			echo "stressapptest -s $time_to_run -M $stressmemvar -W -m 31 -v 4" >> $file
+			stressapptest -s $time_to_run -M $stressmemvar -W -m 31 -v 4 >> $file
 
 		else
-			echo "stressapptest -s 1200 -M $stressmemvar -W -m $stressthreadvar" >> $file
-			stressapptest -s 1200 -M $stressmemvar -W -m $stressthreadvar -v 4 >> $file
+			echo "stressapptest -s $time_to_run -M $stressmemvar -W -m $stressthreadvar" >> $file
+			stressapptest -s $time_to_run -M $stressmemvar -W -m $stressthreadvar -v 4 >> $file
 			
-		fi	
+		fi
 
 		
 	elif [ "$workload" = "stream" ]; then
@@ -147,9 +153,6 @@ do
 		echo "\n\n\n\nFlexible I/O Tester:\n\n" >> $file
 		echo "fio --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=120 --size=128M --numjobs=1" >> $file
 		echo "Latency Test:\n" >> $file
-		
-		# Create a csv version of the timing data
-#		fio_csv_creation
 		
 		# Run and output to report file
 		fio --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=120 --size=128M --numjobs=1 >> $file

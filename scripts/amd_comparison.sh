@@ -117,28 +117,35 @@ do
 
 		# Get number of threads for StressAppTest
 		echo ""
-		read -p "How many threads do you want to use for StressAppTest (default is 31, enter -1 to attempt usage of all the machines threads): " stressthreadvar
+		read -p "How many threads do you want to use for StressAppTest (default is 31, enter -1 to use all the machines threads): " stressthreadvar
 		read -p "How much memory do you want to use for StressAppTest (default is 40000 -> 40gb the format is the # of megabytes): " stressmemvar
-		
-		
-		# StressAppTest for the control node
-		echo "\n\n\n\nStressAppTest (Memory Bandwidth and Latency) for the control node $control_node:\n" >> $file
-		
+		read -p "How long do you want to run StressAppTest (default is 20, with the input as the # of minutes): " time_to_run
+		time_to_run=$((time_to_run * 60))
+
+		if [ "$time_to_run" = "" ]; then
+			time_to_run="1200"
+		fi
+
 		if [ "$stressmemvar" = "" ]; then
 			stressmemvar="40000"
 		fi
 		
+		
+		# StressAppTest for the control node
+		echo "\n\n\n\nStressAppTest (Memory Bandwidth and Latency) for the control node $control_node:\n" >> $file
+
+		
 		if [ "$stressthreadvar" = "-1" ]; then
-			echo "numactl -m $control_node stressapptest -s 1200 -M $stressmemvar -W -v 4" >> $file
-			numactl -m $control_node stressapptest -s 1200 -M $stressmemvar -W -v 4 >> $file
+			echo "numactl -m $control_node stressapptest -s $time_to_run -M $stressmemvar -W -v 4" >> $file
+			numactl -m $control_node stressapptest -s $time_to_run -M $stressmemvar -W -v 4 >> $file
 
 		elif [ "$stressthreadvar" = "" ]; then
-			echo "numactl -m $control_node stressapptest -s 1200 -M $stressmemvar -W -m 31 -v 4" >> $file
-			numactl -m $control_node stressapptest -s 1200 -M $stressmemvar -W -m 31 -v 4  >> $file
+			echo "numactl -m $control_node stressapptest -s $time_to_run -M $stressmemvar -W -m 31 -v 4" >> $file
+			numactl -m $control_node stressapptest -s $time_to_run -M $stressmemvar -W -m 31 -v 4  >> $file
 
 		else
-			echo "numactl -m $control_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4" >> $file
-			numactl -m $control_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
+			echo "numactl -m $control_node stressapptest -s $time_to_run -M $stressmemvar -W -m "$stressthreadvar" -v 4" >> $file
+			numactl -m $control_node stressapptest -s $time_to_run -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
 			
 		fi
 		
@@ -147,16 +154,16 @@ do
 		echo "\n\n\n\nStressAppTest (Memory Bandwidth and Latency) for the interest node $interest_node:\n" >> $file
 		
 		if [ "$stressthreadvar" = "-1" ]; then
-			echo "numactl -m $interest_node stressapptest -s 1200 -M $stressmemvar -W -v 4" >> $file
-			numactl -m $interest_node stressapptest -s 1200 -M $stressmemvar -W -v 4 >> $file
+			echo "numactl -m $interest_node stressapptest -s $time_to_run -M $stressmemvar -W -v 4" >> $file
+			numactl -m $interest_node stressapptest -s $time_to_run -M $stressmemvar -W -v 4 >> $file
 
 		elif [ "$stressthreadvar" = "" ]; then
-			echo "numactl -m $interest_node stressapptest -s 1200 -M $stressmemvar -W -m 31 -v 4" >> $file
-			numactl -m $interest_node stressapptest -s 1200 -M $stressmemvar -W -m 31 -v 4  >> $file
+			echo "numactl -m $interest_node stressapptest -s $time_to_run -M $stressmemvar -W -m 31 -v 4" >> $file
+			numactl -m $interest_node stressapptest -s $time_to_run -M $stressmemvar -W -m 31 -v 4  >> $file
 
 		else
-			echo "numactl -m $interest_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4" >> $file
-			numactl -m $interest_node stressapptest -s 1200 -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
+			echo "numactl -m $interest_node stressapptest -s $time_to_run -M $stressmemvar -W -m "$stressthreadvar" -v 4" >> $file
+			numactl -m $interest_node stressapptest -s $time_to_run -M $stressmemvar -W -m "$stressthreadvar" -v 4  >> $file
 			
 		fi
 		
@@ -179,9 +186,6 @@ do
 		echo "numactl -m $control_node fio --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=120 --size=128M --numjobs=1" >> $file
 		echo "Latency Test:\n" >> $file
 		
-		# Create a csv version of the timing data
-#		fio_csv_creation
-		
 		# Run and output to report file
 		numactl -m $control_node fio --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=120 --size=128M --numjobs=1 >> $file
 #		fio_generate_plots "Read Test" 800 600
@@ -193,8 +197,6 @@ do
 		echo "\n\n\n\nFlexible I/O Tester for the interest node $interest_node:\n\n" >> $file
 		echo "numactl -m $interest_node fio --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=120 --size=128M --numjobs=1" >> $file
 		echo "Latency Test:\n" >> $file
-		
-		# Create a csv version of the timing data
 		
 		# Run and output to report file
 		numactl -m $interest_node fio --name=readlatency-test-job --rw=randread --bs=4k --iodepth=1 --direct=1 --ioengine=libaio --group_reporting --time_based --runtime=120 --size=128M --numjobs=1 >> $file
