@@ -1581,7 +1581,7 @@ while( my $line = <$info>)
 				++$excel_ind;
 				++$excel_ind_2;
 			} else {
-				my ($key, $val) = split(/:/, $line);
+				my ($key, $val) = split(/:\s/, $line);
 				
 				if (defined $key) {
 					$key =~ s/^\s*(.*?)\s*$/$1/;
