@@ -33,7 +33,7 @@ a.	Check the log file to see what was checked and installed
 
 First, move the directory to the desired location. The location is not important and is not required to be in a certain place. This should have all of the needed scripts and tools, but may be missing certain workloads and dependencies.
 
-Next, verify all the depedencies of the workflow by running the depend script using "sh depend.sh". IT IS VERY IMPORTANT THAT YOU DO THIS STEP BEFORE RUNNING THE SCRIPT.
+Next, verify all the depedencies of the workflow by running the depend script using "sh depend.sh". **IT IS VERY IMPORTANT THAT YOU DO THIS STEP BEFORE RUNNING THE SCRIPT.**
 
 At this point all of the scripts should be able to be run. Ensure that when you run the "depend" script there are no situations where something is not found. It is normal for there to be a recompilation and redownloading of workloads happening every time the script is run.
 
