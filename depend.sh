@@ -200,6 +200,7 @@ fi
 	
 
 # Excel::Writer::XLSX
+echo "Checking for / Installing Excel::Writer::XLSX"
 echo "Checking for Excel::Writer::XLSX" >> log/dependency_log_file_$date.txt
 sudo apt-get install build-essential >> log/dependency_log_file_$date.txt
 sudo cpanm Excel::Writer::XLSX
