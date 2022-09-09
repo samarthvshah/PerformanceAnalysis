@@ -17,6 +17,10 @@ if [ "$run" = "2" ]; then
 	# Ask what platform the system is on
 	echo ""
 	read -p "What platform is the system running on? (intel or amd, default is amd): " platform
+	
+	if [ "$platform" = "" ]; then
+		platform="amd"
+	fi
 
 	sh scripts/functional_test.sh "$platform"
 
@@ -25,6 +29,10 @@ elif [ "$run" = "3" ]; then
 	# Ask what platform the system is on
 	echo ""
 	read -p "What platform is the system running on? (intel or amd, default is amd): " platform
+	
+	if [ "$platform" = "" ]; then
+		platform="amd"
+	fi
 	
 
 	if [ "$platform" = "intel" ]; then
@@ -69,6 +77,10 @@ elif [ "$run" = "4" ]; then
 	echo ""
 	read -p "What platform is the system running on? (intel or amd, default is amd): " platform
 	
+	if [ "$platform" = "" ]; then
+		platform="amd"
+	fi
+	
 
 	if [ "$platform" = "intel" ]; then
 	
@@ -109,6 +121,10 @@ elif [ "$run" = "5" ]; then
 	# Ask what platform the system is on
 	echo ""
 	read -p "What platform is the system running on? (intel or amd, default is amd): " platform
+	
+	if [ "$platform" = "" ]; then
+		platform="amd"
+	fi
 
 	# Run the functional portion of the tests
 	sh scripts/functional_test.sh "$platform"
@@ -153,6 +169,10 @@ else
 	# Ask what platform the system is on
 	echo ""
 	read -p "What platform is the system running on? (intel or amd, default is amd): " platform
+	
+	if [ "$platform" = "" ]; then
+		platform="amd"
+	fi
 	
 	sh scripts/system_info.sh "$platform"
 	
