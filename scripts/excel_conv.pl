@@ -660,8 +660,8 @@ while( my $line = <$info>)
 			my $stream_band_data_chart = $workbook->add_chart( type => 'bar', name => 'Bandwidth Data', embedded => 1 );
 			
 			$stream_band_data_chart->add_series(
-				categories => '=STREAM!$A$5:$A$8',
-				values => '=STREAM!$B$5:$B$8',
+				categories => '=STREAM!$A$6:$A$9',
+				values => '=STREAM!$B$6:$B$9',
 				name => 'Best Rate',
 			);
 			
@@ -677,20 +677,20 @@ while( my $line = <$info>)
 			my $stream_timing_data_chart = $workbook->add_chart( type => 'bar', name => 'Timing Data', embedded => 1 );
 		
 			$stream_timing_data_chart->add_series(
-				categories => '=STREAM!$A$5:$A$8',
-				values => '=STREAM!$D$5:$D$8',
+				categories => '=STREAM!$A$6:$A$9',
+				values => '=STREAM!$D$6:$D$9',
 				name => 'Min Time',
 			);
 			
 			$stream_timing_data_chart->add_series(
-				categories => '=STREAM!$A$5:$A$8',
-				values => '=STREAM!$C$5:$C$8',
+				categories => '=STREAM!$A$6:$A$9',
+				values => '=STREAM!$C$6:$C$9',
 				name => 'Avg Time',
 			);
 			
 			$stream_timing_data_chart->add_series(
-				categories => '=STREAM!$A$5:$A$8',
-				values => '=STREAM!$E$5:$E$8',
+				categories => '=STREAM!$A$6:$A$9',
+				values => '=STREAM!$E$6:$E$9',
 				name => 'Max Time',
 			);
 			

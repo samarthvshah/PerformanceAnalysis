@@ -5,11 +5,11 @@ date=`date +"%m-%d-%y_%H-%M-%S"`
 
 # Ask if the user wants to collect sensor data
 echo ""
-read -p "Do you want to collect sensor data? (yes or no, default is yes): " sensors
+read -p "Do you want to collect sensor data? (yes or no, default is no): " sensors
 
 # Setting default value
 if [ "$sensors" = "" ]; then
-	sensors="yes"
+	sensors="no"
 fi
 
 # Starting sensor data collection
@@ -83,16 +83,18 @@ lstopo sys_topo_${date}.png
 # Ask how long the user wants to stress the machine (short and long)
 echo ""
 read -p "How long do you want to run StressAppTest for a short amount of time (default is 2, with the input as the # of minutes): " short_time
-short_time=$((short_time * 60))
 read -p "How long do you want to run StressAppTest for a long amount of time (default is 20, with the input as the # of minutes): " long_time
-long_time=$((long_time * 60))
 
 if [ "$short_time" = "" ]; then
 	short_time="120"
+else 
+	short_time=$((short_time * 60))
 fi
 
 if [ "$long_time" = "" ]; then
 	long_time="1200"
+else
+	long_time=$((long_time * 60))
 fi
 
 
@@ -141,6 +143,7 @@ fi
 
 		
 # Call the perl script to convert the txt report file to an excel file that is easier to read
+# $1 is the platform passed in from the run.sh script
 perl scripts/func_conv.pl "$file" "$date" "$1"
 
 # Deleting the temp files needed for the excel files after they are inserted

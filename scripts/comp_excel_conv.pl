@@ -799,8 +799,8 @@ while( my $line = <$info>)
 			my $stream_cont_band_data_chart = $workbook->add_chart( type => 'bar', name => 'Bandwidth Data', embedded => 1 );
 			
 			$stream_cont_band_data_chart->add_series(
-				categories => '=STREAM Control Node!$A$5:$A$8',
-				values => '=STREAM Control Node!$B$5:$B$8',
+				categories => '=STREAM Control Node!$A$6:$A$9',
+				values => '=STREAM Control Node!$B$6:$B$9',
 				name => 'Best Rate',
 			);
 			
@@ -816,20 +816,20 @@ while( my $line = <$info>)
 			my $stream_cont_timing_data_chart = $workbook->add_chart( type => 'bar', name => 'Timing Data', embedded => 1 );
 		
 			$stream_cont_timing_data_chart->add_series(
-				categories => '=STREAM Control Node!$A$5:$A$8',
-				values => '=STREAM Control Node!$D$5:$D$8',
+				categories => '=STREAM Control Node!$A$6:$A$9',
+				values => '=STREAM Control Node!$D$6:$D$9',
 				name => 'Min Time',
 			);
 			
 			$stream_cont_timing_data_chart->add_series(
-				categories => '=STREAM Control Node!$A$5:$A$8',
-				values => '=STREAM Control Node!$C$5:$C$8',
+				categories => '=STREAM Control Node!$A$6:$A$9',
+				values => '=STREAM Control Node!$C$6:$C$9',
 				name => 'Avg Time',
 			);
 			
 			$stream_cont_timing_data_chart->add_series(
-				categories => '=STREAM Control Node!$A$5:$A$8',
-				values => '=STREAM Control Node!$E$5:$E$8',
+				categories => '=STREAM Control Node!$A$6:$A$9',
+				values => '=STREAM Control Node!$E$6:$E$9',
 				name => 'Max Time',
 			);
 			
@@ -872,8 +872,8 @@ while( my $line = <$info>)
 			my $stream_int_band_data_chart = $workbook->add_chart( type => 'bar', name => 'Bandwidth Data', embedded => 1 );
 			
 			$stream_int_band_data_chart->add_series(
-				categories => '=STREAM Interest Node!$A$5:$A$8',
-				values => '=STREAM Interest Node!$B$5:$B$8',
+				categories => '=STREAM Interest Node!$A$6:$A$9',
+				values => '=STREAM Interest Node!$B$6:$B$9',
 				name => 'Best Rate',
 			);
 			
@@ -889,20 +889,20 @@ while( my $line = <$info>)
 			my $stream_int_timing_data_chart = $workbook->add_chart( type => 'bar', name => 'Timing Data', embedded => 1 );
 		
 			$stream_int_timing_data_chart->add_series(
-				categories => '=STREAM Interest Node!$A$5:$A$8',
-				values => '=STREAM Interest Node!$D$5:$D$8',
+				categories => '=STREAM Interest Node!$A$6:$A$9',
+				values => '=STREAM Interest Node!$D$6:$D$9',
 				name => 'Min Time',
 			);
 			
 			$stream_int_timing_data_chart->add_series(
-				categories => '=STREAM Interest Node!$A$5:$A$8',
-				values => '=STREAM Interest Node!$C$5:$C$8',
+				categories => '=STREAM Interest Node!$A$6:$A$9',
+				values => '=STREAM Interest Node!$C$6:$C$9',
 				name => 'Avg Time',
 			);
 			
 			$stream_int_timing_data_chart->add_series(
-				categories => '=STREAM Interest Node!$A$5:$A$8',
-				values => '=STREAM Interest Node!$E$5:$E$8',
+				categories => '=STREAM Interest Node!$A$6:$A$9',
+				values => '=STREAM Interest Node!$E$6:$E$9',
 				name => 'Max Time',
 			);
 			

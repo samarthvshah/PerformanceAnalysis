@@ -17,11 +17,11 @@ date=`date +"%m-%d-%y_%H-%M-%S"`
 
 # Ask if the user wants to collect sensor data
 echo ""
-read -p "Do you want to collect sensor data? (yes or no, default is yes): " sensors
+read -p "Do you want to collect sensor data? (yes or no, default is no): " sensors
 
 # Setting default value
 if [ "$sensors" = "" ]; then
-	sensors="yes"
+	sensors="no"
 fi
 
 # Starting sensor data collection
@@ -115,10 +115,11 @@ do
 		read -p "How many threads do you want to use for StressAppTest (default is 31, enter -1 to use all the machines threads): " stressthreadvar
 		read -p "How much memory do you want to use for StressAppTest (default is 40000 -> 40gb the format is the # of megabytes): " stressmemvar
 		read -p "How long do you want to run StressAppTest (default is 20, with the input as the # of minutes): " time_to_run
-		time_to_run=$((time_to_run * 60))
-
+		
 		if [ "$time_to_run" = "" ]; then
 			time_to_run="1200"
+		else 	
+			time_to_run=$((time_to_run * 60))
 		fi
 
 		if [ "$stressmemvar" = "" ]; then
