@@ -180,7 +180,7 @@ if [ "$array_size" = "" ]; then
 	array_size=1000000
 fi
 
-gcc -fopenmp -D_OPENMP -DSTREAM_ARRAY_SIZE=$array_size src/Stream/stream.c -o src/Stream/stream >> log/dependency_log_file_$date.txt
+gcc -fopenmp -D_OPENMP -DSTREAM_ARRAY_SIZE=$array_size -mcmodel=medium src/Stream/stream.c -o src/Stream/stream >> log/dependency_log_file_$date.txt
 
 
 # Checking for multichase files
