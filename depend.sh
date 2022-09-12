@@ -161,8 +161,8 @@ if [ -f "src/Stream/stream" ]; then
 	echo "stream found, still must be recompiled"
 	echo "stream found, still must be recompiled\n" >> log/dependency_log_file_$date.txt
 else
-	echo "stream not found, must be manually installed"
-	echo "stream not found, must be manually installed\n" >> log/dependency_log_file_$date.txt
+	echo "stream not found, must be reinstalled"
+	echo "stream not found, must be reinstalled\n" >> log/dependency_log_file_$date.txt
 	mkdir src/Stream >> log/dependency_log_file_$date.txt
 	
 	if [ ! -f "src/Stream/stream.c" ]
