@@ -9,7 +9,7 @@ else
 fi
 
 # Script Start Date and Time (for use in file name)
-date=`date +"%m-%d-%y_%T"`
+date=`date +"%m-%d-%y_%H-%M-%S"`
 has_multi="true"
 
 
