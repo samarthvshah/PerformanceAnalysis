@@ -12,8 +12,18 @@ if [ "$sensors" = "" ]; then
 	sensors="no"
 fi
 
-mkdir Results/perf_intel_comparison_report_${date}/
-file=Results/perf_intel_comparison_report_${date}/perf_intel_comparison_report_${date}.txt
+# Ask what the user wants to name the files
+echo ""
+read -p "What do you want to name the files (default is perf_platform_date.txt): " filename
+
+# Setting default value
+if [ "$filename" = "" ]; then
+	filename=perf_intel_comparison_report_${date}
+fi
+
+mkdir Results/${filename}/
+file=Results/${filename}/${filename}.txt
+
 
 # Showing system Numa information
 echo ""
@@ -48,7 +58,7 @@ fi
 
 # Starting sensor data collection
 if [ "$sensors" = "yes" ]; then
-	sh scripts/sensor_data.sh Results/perf_intel_comparison_report_${date}/sensor_data.txt &
+	sh scripts/sensor_data.sh Results/${filename}/sensor_data.txt &
 	sensor_process=$!
 fi
 
@@ -274,7 +284,7 @@ done
 IFS=$OIFS
 
 # Call the perl script to convert the txt report file to an excel file that is easier to read
-perl scripts/comp_excel_conv.pl "$file" "$workloads" "$date" "$control_node" "$interest_node" "intel"
+perl scripts/comp_excel_conv.pl "$file" "$workloads" "$filename" "$control_node" "$interest_node" "$date"
 
 # Deleting the temp files needed for the excel files after they are inserted
 rm sys_topo_${date}.png

@@ -24,14 +24,26 @@ if [ "$sensors" = "" ]; then
 	sensors="no"
 fi
 
+
+
+# Ask what the user wants to name the files
+echo ""
+read -p "What do you want to name the files (default is perf_platform_date.txt): " filename
+
+# Setting default value
+if [ "$filename" = "" ]; then
+	filename=perf_amd_performance_report_${date}
+fi
+
+mkdir Results/${filename}/
+file=Results/${filename}/${filename}.txt
+
 # Starting sensor data collection
 if [ "$sensors" = "yes" ]; then
-	sh scripts/sensor_data.sh Results/perf_amd_performance_report_${date}/sensor_data.txt &
+	sh scripts/sensor_data.sh Results/${filename}/sensor_data.txt &
 	sensor_process=$!
 fi
 
-mkdir Results/perf_amd_performance_report_${date}/
-file=Results/perf_amd_performance_report_${date}/perf_amd_performance_report_${date}.txt
 
 # System Information
 echo "CPU INFO:\n\n" > $file
@@ -210,7 +222,7 @@ do
 done
 
 # Call the perl script to convert the txt report file to an excel file that is easier to read
-perl scripts/excel_conv.pl "$file" "$workloads" "$date" "performance" "amd"
+perl scripts/excel_conv.pl "$file" "$workloads" "$filename" "$date"
 
 # Deleting the temp files needed for the excel files after they are inserted
 rm sys_topo_${date}.png

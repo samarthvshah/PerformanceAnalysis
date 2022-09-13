@@ -2,8 +2,19 @@
 
 # Script Start Date and Time (for use in file name)
 date=`date +"%m-%d-%y_%H-%M-%S"`
-mkdir Results/perf_${1}_sys_info_report_${date}/
-file=Results/perf_${1}_sys_info_report_${date}/perf_${1}_sys_info_report_${date}.txt
+
+# Ask what the user wants to name the files
+echo ""
+read -p "What do you want to name the files (default is perf_platform_date.txt): " filename
+
+# Setting default value
+if [ "$filename" = "" ]; then
+	filename=perf_${1}_sys_info_report_${date}
+fi
+
+
+mkdir Results/${filename}/
+file=Results/${filename}/${filename}.txt
 
 # System Information
 echo "CPU INFO:\n\n" > $file
@@ -62,7 +73,7 @@ lstopo sys_topo_${date}.png
 
 
 # Call the perl script to convert the txt report file to an excel file that is easier to read
-perl scripts/excel_conv.pl "$file" "" "$date" "sys_info" "$1"
+perl scripts/excel_conv.pl "$file" "" "$filename" "$date"
 
 # Deleting the temp files needed for the excel files after they are inserted
 rm sys_topo_${date}.png
