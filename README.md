@@ -25,9 +25,9 @@ This workflow has the purpose of testing the performance of a system, while also
 1.	Move the directory into the machine
 2.	Cd into the directory
 3.	Run the depend.sh script to ensure the dependencies of the workflow
-a.	Check the log file to see what was checked and installed
-4.	Run the run.sh script that will ask what you want to run and then call the corresponding script
-5.	Check the results of the script in the results directory
+4.	Check the log file to see what was checked and installed
+5.	Run the run.sh script that will ask what you want to run and then call the corresponding script
+6.	Check the results of the script in the results directory
 
 ## Installation
 
